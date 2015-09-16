@@ -1,0 +1,18 @@
+{
+  "name": "photoboot-embedded",
+  "description": "Embedded photoboot module.",
+  "version": "0.0.1",
+  "author": "Brian Turnbull",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bmt/photobook.git"
+  },
+  "engines": {
+    "node": "0.12.x",
+    "npm": "1.4.x"
+  },
+  "dependencies": {
+    "bluebird": "^2.10.0",
+    "tmp": "0.0.27"
+  }
+}
