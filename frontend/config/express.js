@@ -145,21 +145,6 @@ module.exports = function(db) {
 		});
 	});
 
-	if (process.env.NODE_ENV === 'secure') {
-		// Load SSL key and certificate
-		var privateKey = fs.readFileSync('./config/sslcerts/key.pem', 'utf8');
-		var certificate = fs.readFileSync('./config/sslcerts/cert.pem', 'utf8');
-
-		// Create HTTPS Server
-		var httpsServer = https.createServer({
-			key: privateKey,
-			cert: certificate
-		}, app);
-
-		// Return HTTPS server instance
-		return httpsServer;
-	}
-
 	// Return Express server instance
 	return app;
 };

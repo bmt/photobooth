@@ -130,9 +130,6 @@ module.exports = function(grunt) {
 			test: {
 				NODE_ENV: 'test'
 			},
-			secure: {
-				NODE_ENV: 'secure'
-			}
 		},
 		mochaTest: {
 			src: watchFiles.mochaTests,
@@ -177,9 +174,6 @@ module.exports = function(grunt) {
 
 	// Debug task.
 	grunt.registerTask('debug', ['lint', 'copy:localConfig', 'concurrent:debug']);
-
-	// Secure task(s).
-	grunt.registerTask('secure', ['env:secure', 'lint', 'copy:localConfig', 'concurrent:default']);
 
 	// Lint task(s).
 	grunt.registerTask('lint', ['jshint', 'csslint']);
