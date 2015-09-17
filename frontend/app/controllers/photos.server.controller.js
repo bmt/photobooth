@@ -49,10 +49,16 @@ exports.create = function(req, res) {
 };
 
 /**
- * Photos from a specific event
+ * List of photos (requires eventId)
  */
-exports.fromEvent = function(req, res) {
-  Photo.find({event: req.params.eventId}).sort('-created').exec(
+exports.list = function(req, res) {
+  if (!req.query.eventId) {
+    return res.status(404).send({
+      message: 'No event provided.'
+    });
+  }
+
+  Photo.find({event: req.query.eventId}).sort('-created').exec(
       function(err, photos) {
         if (err) {
           return res.status(400).send({

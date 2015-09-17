@@ -54,7 +54,7 @@ describe('Photo CRUD tests', function() {
       .expect(200)
       .end(function(err, res) {
         if (err) done(err);
-        agent.get('/' + res.body._id)
+        agent.get('/photos/' + res.body._id)
           .end(function(err, res) {
             var photo = res.body;
             if (err) done(err);
@@ -78,6 +78,29 @@ describe('Photo CRUD tests', function() {
     done();
 	});
 
+  it('should not be able to list photos without an event', function(done) {
+    // Upload a photo without an event.
+    var eventlessPhoto = new Photo(photo);
+    eventlessPhoto.save(function() {
+      // Create an event
+      var event = new Event();
+      event.save(function() {
+        // Upload a photo in event.
+        photo.event = event;
+        var eventPhoto = new Photo(photo);
+        eventPhoto.save(function() {
+          // Request photos for event.
+          request(app).get('/photos')
+            .expect(404)
+            .end(function(req, res) {
+              (res.body.message).should.match('No event provided.');
+              done();
+            });
+        });
+      });
+    });
+  });
+
   it('should be able to list photos for an event', function(done) {
     // Upload a photo without an event.
     var eventlessPhoto = new Photo(photo);
@@ -86,11 +109,11 @@ describe('Photo CRUD tests', function() {
       var event = new Event();
       event.save(function() {
         // Upload a photo in event.
-        photo.event = event
+        photo.event = event;
         var eventPhoto = new Photo(photo);
         eventPhoto.save(function() {
           // Request photos for event.
-          request(app).get('/photos/' + event.id)
+          request(app).get('/photos?eventId=' + event.id)
             .expect(200)
             .end(function(req, res) {
               res.body.should.be.an.Array.with.lengthOf(1);
@@ -108,7 +131,7 @@ describe('Photo CRUD tests', function() {
 
 		// Save the photo
 		photoObj.save(function() {
-			request(app).get('/' + photoObj._id)
+			request(app).get('/photos/' + photoObj._id)
 				.end(function(req, res) {
 					res.body.should.be.an.Object.with.property('bucketId', 'bucketid');
 					done();
@@ -117,7 +140,7 @@ describe('Photo CRUD tests', function() {
 	});
 
 	it('should return proper error for single photo which doesnt exist', function(done) {
-		request(app).get('/invalidphotoid')
+		request(app).get('/photos/invalidphotoid')
 			.end(function(req, res) {
 				res.body.should.be.an.Object.with.property('message', 'Photo is invalid');
 				done();
@@ -136,7 +159,7 @@ describe('Photo CRUD tests', function() {
           .end(function(err, res) {
             if (err) return done(err);
             // delete an existing photo
-            agent.delete('/' + photoObj.id)
+            agent.delete('/photos/' + photoObj.id)
               .expect(200)
               .end(function(err, res) {
                 if (err) return done(err);
@@ -158,7 +181,7 @@ describe('Photo CRUD tests', function() {
         .end(function(err, res) {
           if (err) done(err);
           // delete an existing photo
-          agent.delete('/' + photoObj.id)
+          agent.delete('/photos/' + photoObj.id)
             .expect(401)
             .end(function(err, res) {
               done(err);
@@ -173,7 +196,7 @@ describe('Photo CRUD tests', function() {
     photoObj.save(function(err) {
       if (err) return done(err);
       // delete an existing photo
-      agent.delete('/' + photoObj.id)
+      agent.delete('/photos/' + photoObj.id)
         .expect(401)
         .end(function(err, res) {
           (res.body.message).should.match('User is not logged in');
