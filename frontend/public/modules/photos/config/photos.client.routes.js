@@ -6,11 +6,11 @@ angular.module('photos').config(['$stateProvider',
 		// Photos state routing
 		$stateProvider.
 		state('viewPhoto', {
-			url: '/photo',
+      url: '/photo/:photoId',
 			templateUrl: 'modules/photos/views/view-photo.client.view.html'
 		}).
 		state('viewEvent', {
-			url: '/event',
+      url: '/event/:eventId',
 			templateUrl: 'modules/photos/views/view-event.client.view.html'
 		});
 	}
