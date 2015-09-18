@@ -61,3 +61,6 @@ mongod
 *.swp
 logs/
 build/
+
+# Secrets
+secrets
