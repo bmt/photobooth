@@ -1,16 +1,17 @@
 'use strict';
 
-var fs = require('fs');
-
 module.exports = function(grunt) {
 	// Unified Watch Object
+  var testFiles = ['app/**/*test.js'];
+  var excludeTests = ['!app/**/*test.js'];
+  var configJs = ['gruntfile.js', 'config/**/*.js'];
 	var watchFiles = {
-		serverViews: ['app/views/**/*.*'],
-		serverJS: ['gruntfile.js', 'server.js', 'config/**/*.js', 'app/**/*.js', '!app/tests/'],
-		clientViews: ['public/modules/**/views/**/*.html'],
-		clientJS: ['public/js/*.js', 'public/modules/**/*.js'],
-		clientCSS: ['public/modules/**/*.css'],
-		mochaTests: ['app/tests/**/*.js']
+    mochaTests: testFiles,
+    serverViews: ['app/views/**/*.*'].concat(excludeTests),
+    serverJS: excludeTests.concat(configJs, ['server.js', 'worker.js', 'app/**/*.js']),
+    clientViews: ['public/modules/**/views/**/*.html'].concat(excludeTests),
+    clientJS: ['public/js/*.js', 'public/modules/**/*.js'].concat(excludeTests),
+    clientCSS: ['public/modules/**/*.css'].concat(excludeTests),
 	};
 
 	// Project Configuration
@@ -33,7 +34,7 @@ module.exports = function(grunt) {
 			clientViews: {
 				files: watchFiles.clientViews,
 				options: {
-					livereload: true
+					livereload: true,
 				}
 			},
 			clientJS: {
@@ -49,10 +50,6 @@ module.exports = function(grunt) {
 				options: {
 					livereload: true
 				}
-			},
-			mochaTests: {
-				files: watchFiles.mochaTests,
-				tasks: ['test:server'],
 			}
 		},
 		jshint: {
@@ -89,12 +86,13 @@ module.exports = function(grunt) {
 			}
 		},
 		nodemon: {
-			dev: {
+			server: {
 				script: 'server.js',
 				options: {
 					nodeArgs: ['--debug'],
 					ext: 'js,html',
-					watch: watchFiles.serverViews.concat(watchFiles.serverJS)
+          watch: watchFiles.serverViews.concat(watchFiles.serverJS),
+          ignore: testFiles,
 				}
 			}
 		},
@@ -119,8 +117,8 @@ module.exports = function(grunt) {
 			}
 		},
 		concurrent: {
-			default: ['nodemon', 'watch'],
-			debug: ['nodemon', 'watch', 'node-inspector'],
+      default: ['nodemon:server', 'watch'],
+      debug: ['nodemon:server', 'watch', 'node-inspector'],
 			options: {
 				logConcurrentOutput: true,
 				limit: 10
@@ -130,6 +128,9 @@ module.exports = function(grunt) {
 			test: {
 				NODE_ENV: 'test'
 			},
+      secure: {
+        NODE_ENV: 'secure'
+      }
 		},
 		mochaTest: {
 			src: watchFiles.mochaTests,
@@ -142,20 +143,13 @@ module.exports = function(grunt) {
 			unit: {
 				configFile: 'karma.conf.js'
 			}
-		},
-		copy: {
-		    localConfig: {
-	            src: 'config/env/local.example.js',
-	            dest: 'config/env/local.js',
-	            filter: function() {
-	            	return !fs.existsSync('config/env/local.js');
-	            }
-		    }
 		}
 	});
 
 	// Load NPM tasks
 	require('load-grunt-tasks')(grunt);
+
+  grunt.loadTasks('tasks');
 
 	// Making grunt default to force in order not to break the project.
 	grunt.option('force', true);
@@ -170,10 +164,13 @@ module.exports = function(grunt) {
 	});
 
 	// Default task(s).
-	grunt.registerTask('default', ['lint', 'copy:localConfig', 'concurrent:default']);
+  grunt.registerTask('default', ['check_env', 'lint', 'concurrent:default']);
 
 	// Debug task.
-	grunt.registerTask('debug', ['lint', 'copy:localConfig', 'concurrent:debug']);
+  grunt.registerTask('debug', ['check_env', 'lint', 'concurrent:debug']);
+
+  // Secure task(s).
+  grunt.registerTask('secure', ['check_env', 'env:secure', 'lint', 'concurrent:default']);
 
 	// Lint task(s).
 	grunt.registerTask('lint', ['jshint', 'csslint']);
@@ -181,8 +178,12 @@ module.exports = function(grunt) {
 	// Build task(s).
 	grunt.registerTask('build', ['lint', 'loadConfig', 'ngAnnotate', 'uglify', 'cssmin']);
 
+  // App Tests
+  grunt.registerTask('appTests', ['env:test', 'mochaTest']);
+
+  // Client Tests
+  grunt.registerTask('clientTests', ['env:test', 'karma:unit']);
+
 	// Test task.
-	grunt.registerTask('test', ['copy:localConfig', 'test:server', 'test:client']);
-	grunt.registerTask('test:server', ['env:test', 'mochaTest']);
-	grunt.registerTask('test:client', ['env:test', 'karma:unit']);
+  grunt.registerTask('test', ['appTests', 'clientTests']);
 };
