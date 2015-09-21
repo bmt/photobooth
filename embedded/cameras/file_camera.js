@@ -7,7 +7,7 @@ var Camera = require('./camera'),
 
 var FileCamera = function() {
   this.nextPhoto = 0;
-}
+};
 util.inherits(FileCamera, Camera);
 
 FileCamera.prototype.takePhoto = function() {
@@ -15,6 +15,12 @@ FileCamera.prototype.takePhoto = function() {
       'cameras/testdata/' + this.nextPhoto + '.jpg');
   this.nextPhoto = (this.nextPhoto + 1) % 3;
   return promise.resolve(stream);
-}
+};
+
+// Static
+FileCamera.isPresent = function() {
+  return true;
+};
+
 
 module.exports = FileCamera;

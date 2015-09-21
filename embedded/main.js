@@ -2,7 +2,7 @@
 
 var timers = require('timers'),
     debug = require('debug')('main'),
-    FileCamera = require('./cameras/file_camera'),
+    getCamera = require('./cameras/factory'),
     Panel = require('./panel');
 
 var camera,
@@ -15,7 +15,7 @@ exports.state = '';
 
 // Emits 'reset' and 'activate' when buttons are pressed.
 var panel = new Panel();
-var camera = new FileCamera();
+var camera = getCamera();
 
 function transition(state) {
   debug('Transitioning: ' + exports.state + ' -> ' + state);
