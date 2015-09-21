@@ -13,6 +13,9 @@
   },
   "dependencies": {
     "bluebird": "^2.10.0",
+    "debug": "^2.2.0",
+    "onoff": "^1.0.2",
+    "process": "^0.11.2",
     "tmp": "0.0.27"
   }
 }
