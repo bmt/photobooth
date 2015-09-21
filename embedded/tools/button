@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# This is a test tool that sends signals to the running process to
+# emulate the press of the activate or reset buttons.
+
+BUTTON=$1
+
+if [[ ! $BUTTON || ($BUTTON != 'activate' && $BUTTON != 'reset') ]]; then
+  echo "Usage: button.sh (activate | reset)"
+  exit 1
+fi
+
+PID=$(ps -ax | grep "node main.js\$" | cut -d' ' -f1)
+
+if [[ $PID ]]; then
+  echo "Found job: $PID"
+  if [[ $BUTTON == 'activate' ]]; then
+    kill -SIGUSR1 $PID
+  else
+    kill -SIGUSR2 $PID
+  fi
+else
+  echo "No job found."
+fi
