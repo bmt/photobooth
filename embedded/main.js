@@ -31,6 +31,11 @@ exports.state = '';
 var panel = new Panel();
 var camera = getCamera();
 
+function handleError(err) {
+  console.trace(err);
+  error();
+}
+
 function transition(state) {
   console.info('Transitioning: ' + exports.state + ' -> ' + state);
   pendingTimeout && clearTimeout(pendingTimeout);
@@ -93,7 +98,7 @@ function capture() {
     } else {
       pending();
     }
-  });  // TODO: error handler
+  }, handleError);
 }
 
 function joinImages(photos) {
@@ -148,10 +153,8 @@ function uploadToStorage(path) {
 function recordInFrontend(storageInfo) {
   console.info(util.inspect(storageInfo));
   return request.post(config.frontend.host + '/photos').form(storageInfo)
-    .then(JSON.parse, function(err) {
-      console.trace(err);
-      error();
-    });
+    .then(JSON.parse)
+    .then(null, handleError);
 }
 
 function printReceipt(photo) {
@@ -169,11 +172,7 @@ function postProcess() {
     .then(recordInFrontend)
     .then(printReceipt)
     .then(finished)
-    .then(null, function(err) {
-      console.trace(err);
-      // TODO: Handle errors. Email?
-      error();
-    });
+    .then(null, handleError);
 }
 
 function error() {
