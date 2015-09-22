@@ -1,24 +1,27 @@
 'use strict';
 
-var init = require('./config/init')(),
+var configInit = require('./config/init')(),
     config = require('./config/config'),
-    bluebird = require('bluebird'),
+    promise = require('bluebird'),
     debug = require('debug')('main'),
-    config = require('./config/init')
+    config = require('./config/config'),
     fs = require('fs'),
     gcloud = require('gcloud')({
       projectId: config.google.project,
       keyFilename: config.google.keyFilename,
     }),
     gm = require('gm'),
+    request = require('request-promise'),
     tmp = require('tmp'),
     util = require('util'),
     getCamera = require('./cameras/factory'),
     Panel = require('./panel');
 
+promise.longStackTraces();
+
 var camera,
-    timeout,
-    promise,
+    pendingTimeout,
+    pendingPromise,
     photos = []
 
 exports.strip = null;
@@ -30,8 +33,8 @@ var camera = getCamera();
 
 function transition(state) {
   console.info('Transitioning: ' + exports.state + ' -> ' + state);
-  timeout && clearTimeout(timeout);
-  promise && promise.cancel();
+  pendingTimeout && clearTimeout(pendingTimeout);
+  pendingPromise && pendingPromise.cancel();
   panel.removeAllListeners('activate');
   exports.state = state;
 }
@@ -51,7 +54,7 @@ function preview() {
   // TODO: Show preview screen.
   // "Press button to start countdown"
   panel.on('activate', pending);
-  var timeout = setTimeout(idle, 1000*60*2);  // 2 minutes.
+  var pendingTimeout = setTimeout(idle, 1000*60*2);  // 2 minutes.
 }
 
 function pending() {
@@ -72,18 +75,18 @@ function pending() {
     --secondsRemaining;
     if (secondsRemaining) {
       updateCountdown();
-      timeout = setTimeout(tick, 1000);
+      pendingTimeout = setTimeout(tick, 1000);
     } else {
       capture();
     }
   }
-  timeout = setTimeout(tick, 1000);
+  pendingTimeout = setTimeout(tick, 1000);
 }
 
 function capture() {
   transition('capture');
   // TODO: Take the picture
-  promise = camera.takePhoto().then(function(photo) {
+  pendingPromise = camera.takePhoto().then(function(photo) {
     photos.push(photo);
     if (photos.length == 3) {
       postProcess();
@@ -94,7 +97,7 @@ function capture() {
 }
 
 function joinImages(photos) {
-  var deferred = bluebird.pending();
+  var deferred = promise.pending();
   var tmpfile = tmp.tmpName(function(err, path) {
     var destPath = path + '.jpg';
     console.info('Writing montage to ' + destPath);
@@ -123,7 +126,7 @@ function joinImages(photos) {
 }
 
 function uploadToStorage(path) {
-  var deferred = bluebird.pending();
+  var deferred = promise.pending();
   var gcs = gcloud.storage();
   var bucket = gcs.bucket(config.google.storageBucket);
   // TODO: Enable gzip
@@ -144,11 +147,19 @@ function uploadToStorage(path) {
 
 function recordInFrontend(storageInfo) {
   console.info(util.inspect(storageInfo));
-  // TODO: Store in frontend.
+  return request.post(config.frontend.host + '/photos').form(storageInfo)
+    .then(JSON.parse, function(err) {
+      console.trace(err);
+      error();
+    });
 }
 
-function printReceipt(id) {
+function printReceipt(photo) {
+  console.info('Photo available at: ' + config.frontend.host +
+      '#!/photo/' + photo._id);
+
   // TODO: Print receipt
+  return promise.resolve();
 }
 
 function postProcess() {
@@ -158,8 +169,8 @@ function postProcess() {
     .then(recordInFrontend)
     .then(printReceipt)
     .then(finished)
-    .catch(function(err) {
-      console.error(err);
+    .then(null, function(err) {
+      console.trace(err);
       // TODO: Handle errors. Email?
       error();
     });
@@ -168,13 +179,13 @@ function postProcess() {
 function error() {
   transition('error');
   // TODO: Show error page.
-  timeout = setTimeout(idle, 1000*60*1);
+  pendingTimeout = setTimeout(idle, 1000*60*1);
 }
 
 function finished() {
   transition('finished');
   // TODO: Show finished strip.
-  timeout = setTimeout(idle, 1000*60*1);
+  pendingTimeout = setTimeout(idle, 1000*60*1);
 }
 
 function init() {

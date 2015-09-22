@@ -5,10 +5,13 @@ module.exports = {
     initial: 5,
     others: 10
   },
+  frontend: {
+    host: 'http://localhost:3000',
+  },
 	google: {
 		clientID: process.env.GOOGLE_ID || 'APP_ID',
 		clientSecret: process.env.GOOGLE_SECRET || 'APP_SECRET',
-		callbackURL: '/auth/google/callback'
+		callbackURL: '/auth/google/callback',
     project: process.env.GOOGLE_PROJECT || 'APP_PROJECT',
     keyFilename: 'secrets/service/prod.json',
     storageBucket: process.env.GOOGLE_STORAGE_BUCKET || 'STORAGE_BUCKET',
