@@ -18,7 +18,7 @@ var panel = new Panel();
 var camera = getCamera();
 
 function transition(state) {
-  debug('Transitioning: ' + exports.state + ' -> ' + state);
+  console.info('Transitioning: ' + exports.state + ' -> ' + state);
   timeout && timers.clearTimeout(timeout);
   promise && promise.cancel();
   panel.removeAllListeners('activate');
