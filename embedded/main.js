@@ -1,8 +1,14 @@
 'use strict';
 
 var timers = require('timers'),
+    bluebird = require('bluebird'),
     debug = require('debug')('main'),
     fs = require('fs'),
+    process = require('process'),
+    gcloud = require('gcloud')({
+      projectId: process.env.GOOGLE_PROJECT,
+      keyFilename: 'secrets/service/prod.json'
+    }),
     gm = require('gm'),
     tmp = require('tmp'),
     util = require('util'),
@@ -79,17 +85,23 @@ function capture() {
   promise = camera.takePhoto().then(function(photo) {
     photos.push(photo);
     if (photos.length == 3) {
-      process();
+      postProcess();
     } else {
       pending();
     }
   });  // TODO: error handler
 }
 
-function process() {
-  transition('process');
+function joinImages(photos) {
+  var deferred = bluebird.pending();
   var tmpfile = tmp.tmpName(function(err, path) {
-    console.info('Writing montage to ' + path + '.jpg');
+    var destPath = path + '.jpg';
+    console.info('Writing montage to ' + destPath);
+
+    // Join them together in a vertical strip with 10px padding and resize to
+    // max width of 1024.  I had to use the manually constructed command because
+    // otherwise .geometry() is added after input arguments and doesn't actually
+    // set the maximum tile size.
     var cmd = gm(photos[2])
       .command('montage')
       .in('-geometry')
@@ -98,13 +110,65 @@ function process() {
       .in('1x')
       .in(photos[0])
       .in(photos[1])
-      .resize('1024x1024')
-      .write(path + '.jpg', finished);
+      .resize('1024')
+      .write(destPath, function() {
+        fs.unlink(photos[0]);
+        fs.unlink(photos[1]);
+        fs.unlink(photos[2]);
+        deferred.resolve(destPath);
+      });
   });
+  return deferred.promise;
+}
 
-  // TODO: Upload
-  // TODO: Print ticket
-  // exports.strip = url.
+function uploadToStorage(path) {
+  var deferred = bluebird.pending();
+  var gcs = gcloud.storage();
+  var bucket = gcs.bucket(process.env.GOOGLE_STORAGE_BUCKET);
+  // TODO: Make public during upload (default acl for bucket?)
+  //       Enable gzip
+  //       Better file name (no tmp in name)
+  //       Better bucket name (no bmt in bucket name)
+  bucket.upload(path, function(err, file) {
+    if (err) {
+      deferred.reject(err);
+    } else {
+      // TODO: Extract public link and resolve with that here.
+      console.info(util.inspect(file));
+      deferred.resolve(file);
+    }
+    // Clean up the temp file.
+    fs.unlink(path);
+  });
+  return deferred.promise;
+}
+
+function recordInFrontend(storageResponse) {
+  // TODO: Update frontend to take url rather than bucket/id
+}
+
+function printReceipt(id) {
+
+}
+
+function postProcess() {
+  transition('postProcess');
+  joinImages(photos)
+    .then(uploadToStorage)
+    .then(recordInFrontend)
+    .then(printReceipt)
+    .then(finished)
+    .catch(function(err) {
+      console.error(err);
+      // TODO: Handle errors. Email?
+      error();
+    });
+}
+
+function error() {
+  transition('error');
+  // TODO: Show error page.
+  timeout = setTimeout(idle, 1000*60*1);
 }
 
 function finished() {
