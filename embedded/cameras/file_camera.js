@@ -3,6 +3,7 @@
 var Camera = require('./camera'),
     promise = require('bluebird'),
     fs = require('fs'),
+    tmp = require('tmp'),
     util = require('util');
 
 var FileCamera = function() {
@@ -11,10 +12,18 @@ var FileCamera = function() {
 util.inherits(FileCamera, Camera);
 
 FileCamera.prototype.takePhoto = function() {
-  var stream = fs.createReadStream(
-      'cameras/testdata/' + this.nextPhoto + '.jpg');
-  this.nextPhoto = (this.nextPhoto + 1) % 3;
-  return promise.resolve(stream);
+  var deferred = promise.pending();
+  var srcPath = 'cameras/testdata/' + this.nextPhoto + '.jpg';
+  var tmpfile = tmp.tmpName(function(err, path) {
+    var src = fs.createReadStream(srcPath);
+    var target = fs.createWriteStream(path);
+    src.pipe(target);
+    src.on('close', function() {
+      deferred.resolve(path);
+    });
+  });
+  this.nextPhoto = ++this.nextPhoto % 3;
+  return deferred.promise;
 };
 
 // Static

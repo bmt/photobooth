@@ -2,6 +2,10 @@
 
 var timers = require('timers'),
     debug = require('debug')('main'),
+    fs = require('fs'),
+    gm = require('gm'),
+    tmp = require('tmp'),
+    util = require('util'),
     getCamera = require('./cameras/factory'),
     Panel = require('./panel');
 
@@ -84,13 +88,23 @@ function capture() {
 
 function process() {
   transition('process');
-  // TODO: Assemble
+  var tmpfile = tmp.tmpName(function(err, path) {
+    console.info('Writing montage to ' + path + '.jpg');
+    var cmd = gm(photos[2])
+      .command('montage')
+      .in('-geometry')
+      .in('+10+10')
+      .in('-tile')
+      .in('1x')
+      .in(photos[0])
+      .in(photos[1])
+      .resize('1024x1024')
+      .write(path + '.jpg', finished);
+  });
+
   // TODO: Upload
   // TODO: Print ticket
   // exports.strip = url.
-
-  // processes.
-  setImmediate(finished);
 }
 
 function finished() {

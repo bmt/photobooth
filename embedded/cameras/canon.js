@@ -30,12 +30,7 @@ Canon.prototype.takePhoto = function() {
           if (err) {
             deferred.reject(err);
           } else {
-            var stream = fs.createReadStream(path);
-            stream.on('close', function() {
-              // Close the file once it is consumed.
-              fs.unlink(path);
-            });
-            deferred.resolve(stream);
+            deferred.resolve(path);
           }
         });
   });

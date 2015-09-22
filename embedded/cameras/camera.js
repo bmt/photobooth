@@ -12,7 +12,8 @@ Camera.isPresent = function() {
 
 /**
  * Captures a photo, writes it to local disk, returns a promise of a
- * readable stream.
+ * path to the captured file.  Callers are responsible for cleaning up the file
+ * when finished.
  */
 Camera.prototype.takePhoto = function() {
   throw new Error('takePhoto must be implemented by subclasses.');
