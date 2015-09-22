@@ -11,11 +11,11 @@ var PhotoSchema = new Schema({
 		type: Date,
 		default: Date.now
 	},
-  bucketId: {
+  bucket: {
     type: String,
     required: true,
   },
-  objectId: {
+  name: {
     type: String,
     required: true,
   },

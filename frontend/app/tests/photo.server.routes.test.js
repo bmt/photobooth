@@ -39,8 +39,8 @@ describe('Photo CRUD tests', function() {
 		// Save a user to the test db and create new photo
 		user.save(function() {
 			photo = {
-        bucketId: 'bucketid',
-        objectId: 'objectid'
+        bucket: 'bucket',
+        name: 'name'
 			};
 			done();
 		});
@@ -58,8 +58,8 @@ describe('Photo CRUD tests', function() {
           .end(function(err, res) {
             var photo = res.body;
             if (err) done(err);
-            photo.bucketId.should.match('bucketid');
-            photo.objectId.should.match('objectid');
+            photo.bucket.should.match('bucket');
+            photo.name.should.match('name');
             // TODO: check created date.
             done();
           });
@@ -133,7 +133,7 @@ describe('Photo CRUD tests', function() {
 		photoObj.save(function() {
 			request(app).get('/photos/' + photoObj._id)
 				.end(function(req, res) {
-					res.body.should.be.an.Object.with.property('bucketId', 'bucketid');
+					res.body.should.be.an.Object.with.property('bucket', 'bucket');
 					done();
 				});
 		});

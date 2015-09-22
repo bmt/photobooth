@@ -29,8 +29,8 @@ describe('Photo Model Unit Tests:', function() {
 
 		user.save(function() {
 			photo = new Photo({
-        bucketId: 'bucketid',
-        objectId: 'objectid'
+        bucket: 'bucket',
+        name: 'name'
 			});
 
 			done();

@@ -1,13 +1,14 @@
 'use strict';
 
-var timers = require('timers'),
+var init = require('./config/init')(),
+    config = require('./config/config'),
     bluebird = require('bluebird'),
     debug = require('debug')('main'),
+    config = require('./config/init')
     fs = require('fs'),
-    process = require('process'),
     gcloud = require('gcloud')({
-      projectId: process.env.GOOGLE_PROJECT,
-      keyFilename: 'secrets/service/prod.json'
+      projectId: config.google.project,
+      keyFilename: config.google.keyFilename,
     }),
     gm = require('gm'),
     tmp = require('tmp'),
@@ -29,7 +30,7 @@ var camera = getCamera();
 
 function transition(state) {
   console.info('Transitioning: ' + exports.state + ' -> ' + state);
-  timeout && timers.clearTimeout(timeout);
+  timeout && clearTimeout(timeout);
   promise && promise.cancel();
   panel.removeAllListeners('activate');
   exports.state = state;
@@ -55,9 +56,9 @@ function preview() {
 
 function pending() {
   transition('pending');
-  var secondsRemaining = 5;
+  var secondsRemaining = config.countdown.initial;
   if (photos.length) {
-    secondsRemaining = 10;
+    secondsRemaining = config.countdown.others;
     // TODO: Show last photo.
   }
   function updateCountdown() {
@@ -124,18 +125,16 @@ function joinImages(photos) {
 function uploadToStorage(path) {
   var deferred = bluebird.pending();
   var gcs = gcloud.storage();
-  var bucket = gcs.bucket(process.env.GOOGLE_STORAGE_BUCKET);
-  // TODO: Make public during upload (default acl for bucket?)
-  //       Enable gzip
+  var bucket = gcs.bucket(config.google.storageBucket);
+  // TODO: Enable gzip
   //       Better file name (no tmp in name)
   //       Better bucket name (no bmt in bucket name)
   bucket.upload(path, function(err, file) {
     if (err) {
       deferred.reject(err);
     } else {
-      // TODO: Extract public link and resolve with that here.
-      console.info(util.inspect(file));
-      deferred.resolve(file);
+      deferred.resolve({bucket: file.metadata.bucket,
+                        name: file.metadata.name});
     }
     // Clean up the temp file.
     fs.unlink(path);
@@ -143,12 +142,13 @@ function uploadToStorage(path) {
   return deferred.promise;
 }
 
-function recordInFrontend(storageResponse) {
-  // TODO: Update frontend to take url rather than bucket/id
+function recordInFrontend(storageInfo) {
+  console.info(util.inspect(storageInfo));
+  // TODO: Store in frontend.
 }
 
 function printReceipt(id) {
-
+  // TODO: Print receipt
 }
 
 function postProcess() {
