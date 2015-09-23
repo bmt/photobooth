@@ -9,6 +9,7 @@ try {
   var onoff = require('onoff');
 } catch (e) {}
 
+
 var Panel = function() {
   this.cleanup = function() {
     activate && activate.unexport();
@@ -29,6 +30,7 @@ var Panel = function() {
   process.on('SIGUSR1', this.activate.bind(this));
   process.on('SIGUSR2', this.reset.bind(this));
 
+  // TODO: Make sure this works on Raspberry pi.
   if (onoff) {
     // Pin 6
     var activate = new onoff.Gpio(17, 'in', 'rising');

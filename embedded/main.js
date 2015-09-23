@@ -15,7 +15,8 @@ var configInit = require('./config/init')(),
     tmp = require('tmp'),
     util = require('util'),
     getCamera = require('./cameras/factory'),
-    Panel = require('./panel');
+    Panel = require('./panel'),
+    Interface = require('./interface');
 
 promise.longStackTraces();
 
@@ -30,6 +31,7 @@ exports.state = '';
 // Emits 'reset' and 'activate' when buttons are pressed.
 var panel = new Panel();
 var camera = getCamera();
+var ui = new Interface();
 
 function handleError(err) {
   console.trace(err);
@@ -47,23 +49,20 @@ function transition(state) {
 function idle() {
   transition('idle');
   photos = [];
-
-  // TODO: Show idle screen.
-  // "Press button to begin"
+  ui.idle();
   panel.on('activate', preview);
 }
 
 function preview() {
   transition('preview');
-
-  // TODO: Show preview screen.
-  // "Press button to start countdown"
+  ui.preview();
   panel.on('activate', pending);
   var pendingTimeout = setTimeout(idle, 1000*60*2);  // 2 minutes.
 }
 
 function pending() {
   transition('pending');
+  ui.pending();
   var secondsRemaining = config.countdown.initial;
   if (photos.length) {
     secondsRemaining = config.countdown.others;
@@ -90,7 +89,6 @@ function pending() {
 
 function capture() {
   transition('capture');
-  // TODO: Take the picture
   pendingPromise = camera.takePhoto().then(function(photo) {
     photos.push(photo);
     if (photos.length == 3) {
@@ -134,8 +132,7 @@ function uploadToStorage(path) {
   var deferred = promise.pending();
   var gcs = gcloud.storage();
   var bucket = gcs.bucket(config.google.storageBucket);
-  // TODO: Enable gzip
-  //       Better file name (no tmp in name)
+  // TODO: Better file name (no tmp in name)
   //       Better bucket name (no bmt in bucket name)
   bucket.upload(path, function(err, file) {
     if (err) {
@@ -167,6 +164,7 @@ function printReceipt(photo) {
 
 function postProcess() {
   transition('postProcess');
+  ui.processing();
   joinImages(photos)
     .then(uploadToStorage)
     .then(recordInFrontend)
@@ -177,13 +175,13 @@ function postProcess() {
 
 function error() {
   transition('error');
-  // TODO: Show error page.
+  ui.error();
   pendingTimeout = setTimeout(idle, 1000*60*1);
 }
 
 function finished() {
   transition('finished');
-  // TODO: Show finished strip.
+  ui.finished();
   pendingTimeout = setTimeout(idle, 1000*60*1);
 }
 
