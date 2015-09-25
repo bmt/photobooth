@@ -36,5 +36,11 @@ Canon.prototype.takePhoto = function() {
   });
   return deferred.promise;
 };
+
+Canon.prototype.takePreview = function() {
+  // TODO: Implement
+  return promise.reject();
+};
+
 module.exports = Canon;
 

@@ -16,13 +16,29 @@ FileCamera.prototype.takePhoto = function() {
   var srcPath = 'cameras/testdata/' + this.nextPhoto + '.jpg';
   var tmpfile = tmp.tmpName(function(err, path) {
     var src = fs.createReadStream(srcPath);
-    var target = fs.createWriteStream(path);
+    var imgpath = path + '.jpg';
+    var target = fs.createWriteStream(imgpath);
     src.pipe(target);
     src.on('close', function() {
-      deferred.resolve(path);
+      deferred.resolve(imgpath);
     });
   });
   this.nextPhoto = ++this.nextPhoto % 3;
+  return deferred.promise;
+};
+
+FileCamera.prototype.takePreview = function() {
+  var deferred = promise.pending();
+  var srcPath = 'cameras/testdata/' + this.nextPhoto + '.jpg';
+  var tmpfile = tmp.tmpName(function(err, path) {
+    var src = fs.createReadStream(srcPath);
+    var imgpath = path + '.jpg';
+    var target = fs.createWriteStream(imgpath);
+    src.pipe(target);
+    src.on('close', function() {
+      deferred.resolve(imgpath);
+    });
+  });
   return deferred.promise;
 };
 

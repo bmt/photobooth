@@ -2,15 +2,21 @@
 
 #include "ofMain.h"
 #include "inputThread.h"
+#include "view.h"
 #include <string>
 #include <vector>
 
 class ofApp : public ofBaseApp{
 public:
+    ofApp() : ofBaseApp(),
+              preview_(&previewPhoto_),
+              pending_(&photoBar_, &previewPhoto_),
+              processing_(&photoBar_, &previewPhoto_) {};
     void setup();
     void update();
     void draw();
     
+    void commandReceived(Command& cmd);
     void keyPressed(int key);
     void keyReleased(int key);
     void mouseMoved(int x, int y );
@@ -21,23 +27,18 @@ public:
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
 private:
-    enum InterfaceMode { IDLE, PREVIEW, PENDING, PROCESSING, FINISHED, ERROR, UNKNOWN};
-    void drawHeading();
-    void drawIdle();
-    void drawPreview();
-    void drawPending();
-    void drawProcessing();
-    void drawFinished();
-    void drawError();
+    InputThread inputThread_;
     
-    string lastMessage;
+    // TODO: guard with mutex
+    Command lastCommand_;
     
-    ofTrueTypeFont	headingFont;
-    ofTrueTypeFont	textFont;
-    
-    InputThread inputThread;
-    
-    vector<string> photoPaths;
-    string finishedPhoto;
-    InterfaceMode mode;
+    Heading heading_;
+    PreviewPhoto previewPhoto_;
+    PhotoBar photoBar_;
+    IdleView idle_;
+    PreviewView preview_;
+    PendingView pending_;
+    ProcessingView processing_;
+    FinishedView finished_;
+    ErrorView error_;
 };

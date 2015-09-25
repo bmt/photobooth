@@ -19,4 +19,9 @@ Logitech.prototype.takePhoto = function() {
   throw new Error('Unimplemented');
 }
 
+Logitech.prototype.takePreview = function() {
+  // TODO: Implmement
+  throw new Error('Unimplemented');
+}
+
 module.exports = Logitech;

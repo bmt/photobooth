@@ -5,72 +5,66 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
     ofBackground(255);
-    ofTrueTypeFont::setGlobalDpi(72);    
-    textFont.loadFont("verdana.ttf", 14, true, true);
-    headingFont.loadFont("verdana.ttf", 60, true, true);
-    
-    mode = IDLE;
-    inputThread.startThread();
+    ofTrueTypeFont::setGlobalDpi(72);
+    ofSetFrameRate(20);
+    inputThread_.startThread();
+    ofAddListener(inputThread_.onCommandReceived, this, &ofApp::commandReceived);
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    switch (lastCommand_.mode) {
+        case IDLE:
+            idle_.update(lastCommand_.args);
+            break;
+        case PREVIEW:
+            preview_.update(lastCommand_.args);
+            break;
+        case PENDING:
+            pending_.update(lastCommand_.args);
+            break;
+        case PROCESSING:
+            processing_.update(lastCommand_.args);
+            break;
+        case FINISHED:
+            finished_.update(lastCommand_.args);
+            break;
+        case ERROR:
+        case UNKNOWN:
+            error_.update(lastCommand_.args);
+            break;
+    }
 
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    drawHeading();
-    switch (mode) {
+    heading_.draw();
+    switch (lastCommand_.mode) {
         case IDLE:
-            drawIdle();
+            idle_.draw();
             break;
         case PREVIEW:
-            drawPreview();
+            preview_.draw();
             break;
         case PENDING:
-            drawPending();
+            pending_.draw();
             break;
         case PROCESSING:
-            drawProcessing();
+            processing_.draw();
             break;
         case FINISHED:
-            drawFinished();
+            finished_.draw();
             break;
         case ERROR:
         case UNKNOWN:
-            drawError();
+            error_.draw();
             break;
     }
 }
 
-void ofApp::drawHeading() {
-    ofSetColor(0);
-    headingFont.drawString("Photobooth", 30, 65);
-}
-
-void ofApp::drawIdle(){
-    textFont.drawString("Press button to begin.", 30, 130);
-}
-
-void ofApp::drawPreview(){
-    textFont.drawString("Press button to start countdown.", 30, 130);
-}
-
-void ofApp::drawPending(){
-    textFont.drawString("Time remaining: ##", 30, 130);
-}
-
-void ofApp::drawProcessing(){
-    textFont.drawString("Processing...", 30, 130);
-}
-
-void ofApp::drawFinished(){
-    textFont.drawString("Finished", 30, 130);
-}
-
-void ofApp::drawError(){
-    textFont.drawString("Error", 30, 130);
+void ofApp::commandReceived(Command& cmd) {
+    lastCommand_ = cmd;
 }
 
 //--------------------------------------------------------------
@@ -110,14 +104,7 @@ void ofApp::windowResized(int w, int h){
 
 //--------------------------------------------------------------
 void ofApp::gotMessage(ofMessage msg){
-    // Parse the state notifications.
-    lastMessage = msg.message;
-    
-    int cmd;
-    sscanf(msg.message.c_str(), "%d", &cmd);
-    if (cmd > 0 && cmd < UNKNOWN) {
-        mode = static_cast<InterfaceMode>(cmd);
-    }
+
 }
 
 //--------------------------------------------------------------
