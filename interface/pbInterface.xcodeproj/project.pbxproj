@@ -66,6 +66,7 @@
 		CC1C21EC1BB22EBD0059AC68 /* inputThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = inputThread.h; sourceTree = "<group>"; };
 		CC824C971BB325850038CBA1 /* view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = view.cpp; sourceTree = "<group>"; };
 		CC824C981BB325850038CBA1 /* view.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = view.h; sourceTree = "<group>"; };
+		CCB3C1321BB5ED1100131E49 /* positions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = positions.h; sourceTree = "<group>"; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../of_v0.8.4_osx_release/libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
 		E45BE9710E8CC7DD009D7055 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
 		E45BE9720E8CC7DD009D7055 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = /System/Library/Frameworks/ApplicationServices.framework; sourceTree = "<absolute>"; };
@@ -193,6 +194,7 @@
 				CC1C21EC1BB22EBD0059AC68 /* inputThread.h */,
 				CC824C971BB325850038CBA1 /* view.cpp */,
 				CC824C981BB325850038CBA1 /* view.h */,
+				CCB3C1321BB5ED1100131E49 /* positions.h */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;

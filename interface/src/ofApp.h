@@ -9,6 +9,7 @@
 class ofApp : public ofBaseApp{
 public:
     ofApp() : ofBaseApp(),
+              images_(3, Image()),
               preview_(&previewPhoto_),
               pending_(&photoBar_, &previewPhoto_),
               processing_(&photoBar_, &previewPhoto_) {};
@@ -26,15 +27,21 @@ public:
     void windowResized(int w, int h);
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
+    
 private:
     InputThread inputThread_;
     
-    // TODO: guard with mutex
-    Command lastCommand_;
+    // App State
+    ViewMode mode_;
+    string timeRemaining_;
+    vector<Image> images_;
+    Image previewImage_;
+    Image finalImage_;
     
-    Heading heading_;
+    // View objects
     PreviewPhoto previewPhoto_;
     PhotoBar photoBar_;
+    Heading heading_;
     IdleView idle_;
     PreviewView preview_;
     PendingView pending_;
