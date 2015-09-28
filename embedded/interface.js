@@ -15,9 +15,9 @@ var InterfaceMode = {
   UNKNOWN: '6',
 }
 
-var Interface = function() {
+var Interface = function(socket) {
   // Start the process
-  var uiProcess = spawn('../interface/bin/pbInterfaceDebug.app/Contents/MacOS/pbInterfaceDebug');
+  var uiProcess = spawn('../interface/bin/pbInterfaceDebug.app/Contents/MacOS/pbInterfaceDebug', [socket]);
 
   uiProcess.on('error', function(err) {
     console.trace(err);
@@ -28,6 +28,7 @@ var Interface = function() {
   });
 
   uiProcess.stdout.pipe(process.stdout);
+  uiProcess.stderr.pipe(process.stderr);
 
   function sendCommand(mode, args) {
     var cmd = mode;

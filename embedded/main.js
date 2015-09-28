@@ -4,6 +4,7 @@ var configInit = require('./config/init')(),
     config = require('./config/config'),
     promise = require('bluebird'),
     debug = require('debug')('main'),
+    process = require('process'),
     config = require('./config/config'),
     fs = require('fs'),
     gcloud = require('gcloud')({
@@ -16,6 +17,7 @@ var configInit = require('./config/init')(),
     util = require('util'),
     getCamera = require('./cameras/factory'),
     Panel = require('./panel'),
+    Server = require('./server'),
     Interface = require('./interface');
 
 promise.longStackTraces();
@@ -24,7 +26,7 @@ var camera,
     pendingInterval,
     pendingTimeout,
     pendingPromise,
-    previewPhoto,
+    previewInstance,
     photos = [],
     finishedPhoto;
 
@@ -34,7 +36,8 @@ exports.state = '';
 // Emits 'reset' and 'activate' when buttons are pressed.
 var panel = new Panel();
 var camera = getCamera();
-var ui = new Interface();
+var previewServer = new Server();
+var ui = new Interface(previewServer.getSocket());
 
 function handleError(err) {
   console.trace(err);
@@ -71,25 +74,14 @@ function idle() {
   panel.on('activate', preview);
 }
 
-function updatePreview() {
-  pendingPromise = camera.takePreview().then(function(photo) {
-    previewPhoto && fs.unlink(previewPhoto);
-    previewPhoto = photo;
-    return previewPhoto;
-  }, handleError);
-  return pendingPromise;
-}
-
 function preview() {
   transition('preview');
   resetPhotos();
   panel.on('activate', pending);
-  function updateUI() {
-    updatePreview().then(ui.preview.bind(ui), handleError);
-  }
 
-  // Update UI every 2 seconds until timeout.
-  pendingInterval = setInterval(updateUI, 1000 * 2);
+  previewInstance = camera.openPreview();
+  previewServer.setSourceStream(previewInstance.stream);
+  ui.preview();
 
   // Timeout back to idle after 2 minutes.
   pendingTimeout = setTimeout(idle, 1000*60*2);  // 2 minutes.
@@ -102,13 +94,12 @@ function pending() {
     secondsRemaining = config.countdown.others;
   }
 
-  // Update preview every 2 seconds.
-  updatePreview();
-  pendingInterval = setInterval(updatePreview, 1000 * 2);
+  previewInstance = camera.openPreview();
+  previewServer.setSourceStream(previewInstance.stream);
 
   // Called every second by tick().
   function updateUI() {
-    ui.pending(secondsRemaining, previewPhoto, photos);
+    ui.pending(secondsRemaining, photos);
   }
   updateUI();
 
@@ -195,7 +186,7 @@ function printReceipt(photo) {
 
 function postProcess() {
   transition('postProcess');
-  ui.processing(previewPhoto, photos);
+  ui.processing(photos);
   joinImages(photos)
     .then(uploadToStorage)
     .then(recordInFrontend)
@@ -227,6 +218,16 @@ exports.init = init;
 function forever() {
   setTimeout(forever, 1000);
 }
+
+// On exit.
+function onExit() {
+  previewServer.close();
+  process.exit(1);
+}
+process.on('SIGINT', onExit);
+process.on('exit', onExit);
+
+
 
 if (require.main === module) {
   init();

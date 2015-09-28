@@ -31,37 +31,35 @@ void PhotoBar::update(const vector<Image>& images) {
 }
 
 void PhotoBar::draw(int x, int y) {
+    ofPushStyle();
     ofSetColor(255);
     for (int i=0; i < images_.size(); ++i) {
         images_[i].draw(x, y + i * (PHOTOBAR_PHOTO_HEIGHT + PHOTOBAR_MARGIN));
     }
-}
-
-void PreviewPhoto::update(const Image& image) {
-    image_ = image;
-    image_.update();
-}
-
-void PreviewPhoto::draw(int x, int y) {
-    ofSetColor(255);
-    image_.draw(x, y);
+    ofPopStyle();
 }
 
 void Heading::draw() {
+    ofPushStyle();
     ofSetColor(0);
     font_.drawString("Photobooth", GUTTER, HEADING_Y);
+    ofPopStyle();
 }
 
 void IdleView::draw() {
+    ofPushStyle();
     ofSetColor(0);
     defaultFont_.drawString("Press button to begin.",
                             GUTTER, TEXT_Y);
+    ofPopStyle();
 }
 
 void PreviewView::draw() {
+    ofPushStyle();
     ofSetColor(0);
     defaultFont_.drawString("Press button to start countdown.", GUTTER, TEXT_Y);
-    previewPhoto_->draw(PREVIEW_X, PREVIEW_Y);
+    preview_->draw(PREVIEW_X, PREVIEW_Y);
+    ofPopStyle();
 }
 
 void PendingView::update(const string& timeRemaining) {
@@ -69,18 +67,23 @@ void PendingView::update(const string& timeRemaining) {
 }
 
 void PendingView::draw() {
+    ofPushStyle();
     ofSetColor(0);
     string output = "Time remaining: " + timeRemaining_;
     defaultFont_.drawString(output, GUTTER, TEXT_Y);
-    photoBar_->draw(PHOTOBAR_X, PHOTOBAR_Y);
-    previewPhoto_->draw(PREVIEW_X, PREVIEW_Y);
+    bar_->draw(PHOTOBAR_X, PHOTOBAR_Y);
+    preview_->draw(PREVIEW_X, PREVIEW_Y);
+    ofPopStyle();
 }
 
 void ProcessingView::draw() {
+    ofPushStyle();
     ofSetColor(0);
     defaultFont_.drawString("Processing...", GUTTER, TEXT_Y);
-    photoBar_->draw(PHOTOBAR_X, PHOTOBAR_Y);
-    previewPhoto_->draw(PREVIEW_X, PREVIEW_Y);
+    bar_->draw(PHOTOBAR_X, PHOTOBAR_Y);
+    // TODO: show last snapshot in video slot.
+    // preview_->draw(PREVIEW_X, PREVIEW_Y);
+    ofPopStyle();
 }
 
 void FinishedView::update(const Image& image) {
@@ -91,12 +94,15 @@ void FinishedView::update(const Image& image) {
 }
 
 void FinishedView::draw() {
+    ofPushStyle();
     ofSetColor(0);
     defaultFont_.drawString("Finished", GUTTER, TEXT_Y);
+    ofPopStyle();
     image_.draw(FINAL_PHOTO_X, FINAL_PHOTO_Y);
 }
 
 void ErrorView::draw() {
     ofSetColor(0);
     defaultFont_.drawString("Error", GUTTER, TEXT_Y);
+    ofPopStyle();
 }

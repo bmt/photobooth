@@ -1,24 +1,28 @@
 'use strict';
 
-var Camera = require('./camera'),
-    promise = require('bluebird'),
+var promise = require('bluebird'),
     fs = require('fs'),
     tmp = require('tmp'),
+    stream = require('stream'),
     util = require('util');
 
 var FileCamera = function() {
   this.nextPhoto = 0;
+  this.preview = null;
 };
-util.inherits(FileCamera, Camera);
 
 FileCamera.prototype.takePhoto = function() {
+  if (this.preview) {
+    this.preview.close();
+  }
+
   var deferred = promise.pending();
   var srcPath = 'cameras/testdata/' + this.nextPhoto + '.jpg';
   var tmpfile = tmp.tmpName(function(err, path) {
     var src = fs.createReadStream(srcPath);
     var imgpath = path + '.jpg';
     var target = fs.createWriteStream(imgpath);
-    src.pipe(target);
+    src.pipe(target, {end: false});
     src.on('close', function() {
       deferred.resolve(imgpath);
     });
@@ -27,19 +31,35 @@ FileCamera.prototype.takePhoto = function() {
   return deferred.promise;
 };
 
-FileCamera.prototype.takePreview = function() {
-  var deferred = promise.pending();
-  var srcPath = 'cameras/testdata/' + this.nextPhoto + '.jpg';
-  var tmpfile = tmp.tmpName(function(err, path) {
-    var src = fs.createReadStream(srcPath);
-    var imgpath = path + '.jpg';
-    var target = fs.createWriteStream(imgpath);
-    src.pipe(target);
-    src.on('close', function() {
-      deferred.resolve(imgpath);
-    });
+var Preview = function(stream, process) {
+  this.stream = stream;
+  this.process = process;
+  this.open = true;
+  this.close = function() {
+    this.open = false;
+    if (this.process) {
+      this.process.kill();
+    }
+  }
+};
+
+FileCamera.prototype.openPreview = function() {
+  if (this.preview && this.preview.open) {
+    return this.preview;
+  } 
+  var srcPath = 'cameras/testdata/movie.mjpg';
+  var outputStream = new stream.PassThrough();
+  this.preview = new Preview(outputStream);
+
+  // Continually read the file over and over again.
+  var fileStream = fs.createReadStream(srcPath);
+  fileStream.pipe(outputStream, {end: false});
+  fileStream.on('end', function() {
+    fileStream.unpipe(outputStream);
+    fileStream = fs.createReadStream(srcPath);
+    fileStream.pipe(outputStream, {end: false});
   });
-  return deferred.promise;
+  return this.preview;
 };
 
 // Static

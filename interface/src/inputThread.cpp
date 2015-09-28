@@ -21,16 +21,16 @@ Command::Command() : mode(IDLE) {}
 Command Command::FromString(std::string input) {
     ViewMode mode = UNKNOWN;
     vector<string> args;
-    
+
     const char* c = input.c_str();
-    
+
     // Parse mode
     size_t modeLength = 0;
     while(*c && *c != '\t') {
         modeLength++;
         ++c;
     }
-    
+
     const string rawMode(input.c_str(), modeLength);
     int parsedMode = UNKNOWN;
     sscanf(rawMode.c_str(), "%d", &parsedMode);
@@ -52,7 +52,7 @@ Command Command::FromString(std::string input) {
             args.push_back(string(arg, argLength));
         }
     }
-    
+
     // Create the command.
     auto_ptr<Command> cmd(new Command(mode, args));
     return *cmd;

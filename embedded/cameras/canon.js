@@ -3,15 +3,12 @@
 var promise = require('bluebird'),
     tmp = require('tmp'),
     fs = require('fs'),
-    Camera = require('./camera'),
     exec = require('child_process').exec,
     util = require('util');
 
 var gphoto = '/opt/local/bin/gphoto2';
 
-var Canon = function() {
-}
-util.inherits(Canon, Camera);
+var Canon = function() {}
 
 // Static
 Canon.isPresent = function() {

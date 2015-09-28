@@ -4,29 +4,42 @@
 #include <vector>
 #include <algorithm>    // std::copy
 
+ofApp::ofApp(const char* socket)
+: ofBaseApp(),
+socket_(socket),
+images_(3, Image()),
+previewVideo_(socket_),
+preview_(&previewVideo_),
+pending_(&photoBar_, &previewVideo_),
+processing_(&photoBar_) {};
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    ofBackground(255);
+    ofBackground(200);
+    ofSetColor(255);
     ofTrueTypeFont::setGlobalDpi(72);
-    ofSetFrameRate(20);
+    ofSetVerticalSync(true);
     inputThread_.startThread();
+    previewVideo_.connect();
+    previewVideo_.startThread();
     ofAddListener(inputThread_.onCommandReceived, this, &ofApp::commandReceived);
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    previewPhoto_.update(previewImage_);
     photoBar_.update(images_);
     switch (mode_) {
         case PENDING:
+            previewVideo_.update();
             pending_.update(timeRemaining_);
             break;
         case FINISHED:
             finished_.update(finalImage_);
             break;
-        case IDLE:
         case PREVIEW:
+            previewVideo_.update();
+            break;
+        case IDLE:
         case PROCESSING:
         case ERROR:
         case UNKNOWN:
@@ -93,19 +106,15 @@ void ofApp::commandReceived(Command& cmd) {
             if (cmd.args.size() > 0) {
                 timeRemaining = cmd.args[0];
             }
-    
-            if (cmd.args.size() > 1) {
-                previewPath = cmd.args[1];
-            }
-            
-            std::copy(cmd.args.begin() + 2,
+
+            std::copy(cmd.args.begin() + 1,
                       cmd.args.end(), imgPaths.begin());
             break;
         case PROCESSING:
             if (cmd.args.size() > 0) {
                 previewPath = cmd.args[1];
             }
-            
+
             std::copy(cmd.args.begin() + 1, cmd.args.end(),
                       imgPaths.begin());
         case FINISHED:
@@ -117,16 +126,14 @@ void ofApp::commandReceived(Command& cmd) {
         case UNKNOWN:
             break;
     }
-    
-    Image newPreviewImage;
-    newPreviewImage.image->setUseTexture(false);
+
     Image newFinalImage;
     newFinalImage.image->setUseTexture(false);
     vector<Image> newImages(3);
     for (Image i : newImages) {
         i.image->setUseTexture(false);
     }
-    
+
     // Load any new images.
     for (int i = 0; i < 3; ++i) {
         updateImageIfChanged(imgPaths[i], images_[i],
@@ -134,22 +141,18 @@ void ofApp::commandReceived(Command& cmd) {
                                 PHOTOBAR_PHOTO_HEIGHT,
                                 &(newImages[i]));
     }
-    updateImageIfChanged(previewPath, previewImage_,
-                            PREVIEW_PHOTO_WIDTH,
-                            PREVIEW_PHOTO_HEIGHT, &newPreviewImage);
     updateImageIfChanged(finalPath, finalImage_,
                             0, 0, &newFinalImage);
     // TODO: grab a mutex
-    
+
     // Apply any changes images.
     for (int i = 0; i < 3; ++i) {
         swapImageIfChanged(&images_[i], &newImages[i]);
     }
-    swapImageIfChanged(&previewImage_, &newPreviewImage);
     swapImageIfChanged(&finalImage_, &newFinalImage);
     mode_ = cmd.mode;
     timeRemaining_ = timeRemaining;
-    
+
     // TODO: release mutex
 }
 
@@ -194,6 +197,6 @@ void ofApp::gotMessage(ofMessage msg){
 }
 
 //--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo){ 
+void ofApp::dragEvent(ofDragInfo dragInfo){
 
 }

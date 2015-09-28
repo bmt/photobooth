@@ -2,21 +2,18 @@
 
 #include "ofMain.h"
 #include "inputThread.h"
+#include "videoGrabber.h"
 #include "view.h"
 #include <string>
 #include <vector>
 
 class ofApp : public ofBaseApp{
 public:
-    ofApp() : ofBaseApp(),
-              images_(3, Image()),
-              preview_(&previewPhoto_),
-              pending_(&photoBar_, &previewPhoto_),
-              processing_(&photoBar_, &previewPhoto_) {};
+    ofApp(const char* socket);
     void setup();
     void update();
     void draw();
-    
+
     void commandReceived(Command& cmd);
     void keyPressed(int key);
     void keyReleased(int key);
@@ -27,19 +24,19 @@ public:
     void windowResized(int w, int h);
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
-    
+
 private:
+    const string socket_;
     InputThread inputThread_;
-    
+
     // App State
     ViewMode mode_;
     string timeRemaining_;
     vector<Image> images_;
-    Image previewImage_;
+    VideoGrabber previewVideo_;
     Image finalImage_;
-    
+
     // View objects
-    PreviewPhoto previewPhoto_;
     PhotoBar photoBar_;
     Heading heading_;
     IdleView idle_;

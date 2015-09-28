@@ -10,6 +10,7 @@
 #define view_h
 
 #include "ofMain.h"
+#include "videoGrabber.h"
 #include <vector>
 #include <string>
 
@@ -38,7 +39,7 @@ public:
         path = rhs.path;
         image.reset(new ofImage(*(rhs.image)));
     }
-                
+
     string path;
     auto_ptr<ofImage> image;
     void swap(Image* other) {
@@ -51,7 +52,7 @@ public:
             image.reset(tmpImg);
         }
     }
-    
+
     // This disables textures because we can't allocate textures off the main thread.
     void preLoad(string newPath) {
         image->setUseTexture(false);
@@ -60,7 +61,7 @@ public:
             image->loadImage(ofBufferFromFile(path, true));
         }
     }
-    
+
     // Once back on the main thread, the image must be properly all
     void update() {
         if (path.size() && !image->isUsingTexture()) {
@@ -68,9 +69,8 @@ public:
             image->update();
         }
     }
-    
+
     void draw(int x, int y) {
-        ofSetColor(255);
         if (!path.empty()) {
             image->draw(x, y);
         }
@@ -84,15 +84,6 @@ public:
     void draw(int x, int y);
 private:
     vector<Image> images_;
-};
-
-class PreviewPhoto {
-public:
-    PreviewPhoto() {}
-    void update(const Image& image);
-    void draw(int x, int y);
-private:
-    Image image_;
 };
 
 class View {
@@ -116,39 +107,37 @@ public:
 
 class PreviewView : public View {
 public:
-    PreviewView(PreviewPhoto* preview)
+    PreviewView(VideoGrabber* preview)
       : View(),
-        previewPhoto_(preview) {};
+        preview_(preview) {};
     virtual void draw();
 private:
-    PreviewPhoto* previewPhoto_;
+    VideoGrabber* preview_;
 };
 
 class PendingView : public View {
 public:
-    PendingView(PhotoBar* bar, PreviewPhoto* preview)
+    PendingView(PhotoBar* bar, VideoGrabber* preview)
       : View(),
-        photoBar_(bar),
-        previewPhoto_(preview),
+        bar_(bar),
+        preview_(preview),
         timeRemaining_("") {};
     virtual void draw();
     virtual void update(const string& timeRemaining);
 private:
     string timeRemaining_;
-    PhotoBar* photoBar_;
-    PreviewPhoto* previewPhoto_;
+    PhotoBar* bar_;
+    VideoGrabber* preview_;
 };
 
 class ProcessingView : public View {
 public:
-    ProcessingView(PhotoBar* bar, PreviewPhoto* preview)
+    ProcessingView(PhotoBar* bar)
       : View(),
-        photoBar_(bar),
-        previewPhoto_(preview) {}
+        bar_(bar) {}
     virtual void draw();
 private:
-    PreviewPhoto* previewPhoto_;
-    PhotoBar* photoBar_;
+    PhotoBar* bar_;
 };
 
 class FinishedView : public View {

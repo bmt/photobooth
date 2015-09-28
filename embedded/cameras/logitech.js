@@ -1,12 +1,6 @@
 'use strict';
 
-var Camera = require('./camera'),
-    util = require('util');
-
-
-var Logitech = function() {
-}
-util.inherits(Logitech, Camera);
+var Logitech = function() {}
 
 
 // Static
