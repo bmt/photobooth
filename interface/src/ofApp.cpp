@@ -95,13 +95,8 @@ void swapImageIfChanged(Image* current, Image* newImg) {
 
 void ofApp::commandReceived(Command& cmd) {
     vector<string> imgPaths(3, "");
-    string timeRemaining, previewPath, finalPath;
+    string timeRemaining, finalPath;
     switch(cmd.mode) {
-        case PREVIEW:
-            if (cmd.args.size() > 0) {
-                previewPath = cmd.args[0];
-            }
-            break;
         case PENDING:
             if (cmd.args.size() > 0) {
                 timeRemaining = cmd.args[0];
@@ -111,17 +106,14 @@ void ofApp::commandReceived(Command& cmd) {
                       cmd.args.end(), imgPaths.begin());
             break;
         case PROCESSING:
-            if (cmd.args.size() > 0) {
-                previewPath = cmd.args[1];
-            }
-
-            std::copy(cmd.args.begin() + 1, cmd.args.end(),
+            std::copy(cmd.args.begin(), cmd.args.end(),
                       imgPaths.begin());
         case FINISHED:
             if (cmd.args.size() > 0) {
                 finalPath = cmd.args[0];
             }
         case IDLE:
+        case PREVIEW:
         case ERROR:
         case UNKNOWN:
             break;
@@ -145,7 +137,7 @@ void ofApp::commandReceived(Command& cmd) {
                             0, 0, &newFinalImage);
     // TODO: grab a mutex
 
-    // Apply any changes images.
+    // Apply any changes to images.
     for (int i = 0; i < 3; ++i) {
         swapImageIfChanged(&images_[i], &newImages[i]);
     }
