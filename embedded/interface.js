@@ -1,6 +1,7 @@
 'use strict';
 
 var spawn = require('child_process').spawn,
+    config = require('./config/config'),
     debug = require('debug')('interface'),
     process = require('process'),
     _ = require('lodash');
@@ -17,12 +18,13 @@ var InterfaceMode = {
 
 var Interface = function(socket) {
   // Start the process
-  var uiProcess = spawn('../interface/bin/pbInterfaceDebug.app/Contents/MacOS/pbInterfaceDebug', [socket]);
+  var uiProcess = spawn(config.interface.path, [socket]);
 
   uiProcess.on('error', function(err) {
     console.trace(err);
   });
 
+  // TODO: Figure out what to do when interface exits.
   uiProcess.on('exit', function() {
     console.error('interface exited');
   });

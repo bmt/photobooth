@@ -221,11 +221,20 @@ function forever() {
 
 // On exit.
 function onExit() {
+  // TODO: shutdown interface before exiting
   previewServer.close();
   process.exit(1);
 }
 process.on('SIGINT', onExit);
 process.on('exit', onExit);
+
+// Log uncaught exceptions
+process.on('uncaughtException', function (err) {
+  console.error((new Date).toUTCString() + ' uncaughtException:', err.message)
+  console.error(err.stack)
+  onExit();
+  process.exit(1)
+});
 
 
 if (require.main === module) {

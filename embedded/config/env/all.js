@@ -8,6 +8,13 @@ module.exports = {
   frontend: {
     host: 'http://localhost:3000',
   },
+  interface: {
+    // This is an OSX 64-bit universal binary.
+    // TODO: Figure out a platform-specific config option.
+    // path: './bin/pbInterface.app/Contents/MacOS/pbInterface'
+    // TODO: Bundle the fonts properly so the stand-alone binary works.
+    path: '../interface/bin/pbInterfaceDebug.app/Contents/MacOS/pbInterfaceDebug'
+  },
 	google: {
 		clientID: process.env.GOOGLE_ID || 'APP_ID',
 		clientSecret: process.env.GOOGLE_SECRET || 'APP_SECRET',
