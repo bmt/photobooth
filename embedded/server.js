@@ -7,8 +7,7 @@ var net = require('net'),
 var Server = function() {
   var connections = [];
   var src = null;
-  //var socket = tmp.tmpNameSync();
-  var socket = '/var/run/photobooth/photobooth.video';
+  var socket = tmp.tmpNameSync();
   var server = net.createServer(function(c) { //'connection' listener
     debug('Client connected.');
     c.on('end', function() {
