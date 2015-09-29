@@ -44,17 +44,17 @@ var Interface = function(socket) {
     sendCommand(InterfaceMode.IDLE);
   };
 
-  this.preview = function(previewPath) {
-    sendCommand(InterfaceMode.PREVIEW, [previewPath]);
+  this.preview = function() {
+    sendCommand(InterfaceMode.PREVIEW);
   };
 
-  this.pending = function(time, previewPath, images) {
+  this.pending = function(time, images) {
     sendCommand(InterfaceMode.PENDING,
-        _.flatten([time, previewPath, images]));
+        _.flatten([time, images]));
   };
 
-  this.processing = function(previewPath, images) {
-    sendCommand(InterfaceMode.PROCESSING, _.flatten([previewPath, images]));
+  this.processing = function(images) {
+    sendCommand(InterfaceMode.PROCESSING, images);
   };
 
   this.finished = function(image) {
