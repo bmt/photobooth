@@ -46,19 +46,11 @@ var Preview = function(stream, process) {
 FileCamera.prototype.openPreview = function() {
   if (this.preview && this.preview.open) {
     return this.preview;
-  } 
+  }
   var srcPath = 'cameras/testdata/movie.mjpg';
-  var outputStream = new stream.PassThrough();
-  this.preview = new Preview(outputStream);
-
-  // Continually read the file over and over again.
+  // TODO: Continually read the file over and over again.
   var fileStream = fs.createReadStream(srcPath);
-  fileStream.pipe(outputStream, {end: false});
-  fileStream.on('end', function() {
-    fileStream.unpipe(outputStream);
-    fileStream = fs.createReadStream(srcPath);
-    fileStream.pipe(outputStream, {end: false});
-  });
+  this.preview = new Preview(fileStream);
   return this.preview;
 };
 
@@ -66,6 +58,5 @@ FileCamera.prototype.openPreview = function() {
 FileCamera.isPresent = function() {
   return true;
 };
-
 
 module.exports = FileCamera;

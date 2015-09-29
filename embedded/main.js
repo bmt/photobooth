@@ -228,7 +228,6 @@ process.on('SIGINT', onExit);
 process.on('exit', onExit);
 
 
-
 if (require.main === module) {
   init();
   forever();
