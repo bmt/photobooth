@@ -23,7 +23,8 @@ FileCamera.prototype.takePhoto = function() {
       var target = fs.createWriteStream(imgpath);
       src.pipe(target, {end: false});
       src.on('close', function() {
-        deferred.resolve(imgpath);
+        // Simulate camera delay.
+        setTimeout(deferred.resolve.bind(deferred, imgpath), 2000);
       });
     });
     this.nextPhoto = ++this.nextPhoto % 3;
