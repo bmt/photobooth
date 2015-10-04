@@ -11,6 +11,33 @@
 #include "ofMain.h"
 #include <string>
 
+LoadingAnimation::LoadingAnimation(float x, float y)
+: x_(x), y_(y), visible_(false) { };
+
+void LoadingAnimation::setVisible(bool visible) {
+    visible_ = visible;
+};
+
+void LoadingAnimation::update() {
+  int durationMillis = 900;
+  float angleBegin  = (ofGetElapsedTimeMillis() % durationMillis) / (float) durationMillis * 360.0;
+  float angleEnd = 360.0 / 4.0 + angleBegin; // 1/4 of circle
+
+  line_.clear();
+  line_.arc(ofPoint(x_, y_), LOADING_W, LOADING_H, angleBegin, angleEnd,
+            60);
+};
+
+void LoadingAnimation::draw() {
+    if (visible_) {
+      ofPushStyle();
+      ofSetColor(230, 230, 230);
+      ofSetLineWidth(10);
+      line_.draw();
+      ofPopStyle();
+    }
+};
+
 void drawArgs(ofTrueTypeFont font, vector<string> args) {
     string allArgs = "Args: ";
     for(string arg : args) {
@@ -69,10 +96,16 @@ void PendingView::update(const string& timeRemaining) {
 void PendingView::draw() {
     ofPushStyle();
     ofSetColor(0);
-    string output = "Time remaining: " + timeRemaining_;
-    defaultFont_.drawString(output, GUTTER, TEXT_Y);
     bar_->draw(PHOTOBAR_X, PHOTOBAR_Y);
     preview_->draw(PREVIEW_X, PREVIEW_Y);
+    string output;
+    if (timeRemaining_ == "0") {
+        load_->setVisible(true);
+        output = "Say Cheese!";
+    } else {
+        output = "Time remaining: " + timeRemaining_;
+    }
+    defaultFont_.drawString(output, GUTTER, TEXT_Y);
     ofPopStyle();
 }
 
@@ -80,6 +113,7 @@ void ProcessingView::draw() {
     ofPushStyle();
     ofSetColor(0);
     defaultFont_.drawString("Processing...", GUTTER, TEXT_Y);
+    load_->setVisible(true);
     bar_->draw(PHOTOBAR_X, PHOTOBAR_Y);
     // TODO: show last snapshot in video slot.
     // preview_->draw(PREVIEW_X, PREVIEW_Y);
@@ -94,10 +128,6 @@ void FinishedView::update(const Image& image) {
 }
 
 void FinishedView::draw() {
-    ofPushStyle();
-    ofSetColor(0);
-    defaultFont_.drawString("Finished", GUTTER, TEXT_Y);
-    ofPopStyle();
     image_.draw(FINAL_PHOTO_X, FINAL_PHOTO_Y);
 }
 

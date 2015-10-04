@@ -17,6 +17,19 @@
 
 enum ViewMode { IDLE, PREVIEW, PENDING, PROCESSING, FINISHED, ERROR, UNKNOWN};
 
+class LoadingAnimation {
+  public:
+    LoadingAnimation(float x, float y);
+    void setVisible(bool visible);
+    void update();
+    void draw();
+  private:
+    float x_;
+    float y_;
+    bool visible_;
+    ofPolyline line_;
+};
+
 class Heading {
 public:
     void clear();
@@ -117,10 +130,11 @@ private:
 
 class PendingView : public View {
 public:
-    PendingView(PhotoBar* bar, VideoGrabber* preview)
+    PendingView(PhotoBar* bar, VideoGrabber* preview, LoadingAnimation* load)
       : View(),
         bar_(bar),
         preview_(preview),
+        load_(load),
         timeRemaining_("") {};
     virtual void draw();
     virtual void update(const string& timeRemaining);
@@ -128,16 +142,19 @@ private:
     string timeRemaining_;
     PhotoBar* bar_;
     VideoGrabber* preview_;
+    LoadingAnimation* load_;
 };
 
 class ProcessingView : public View {
 public:
-    ProcessingView(PhotoBar* bar)
+    ProcessingView(PhotoBar* bar, LoadingAnimation* load)
       : View(),
-        bar_(bar) {}
+        bar_(bar),
+        load_(load){}
     virtual void draw();
 private:
     PhotoBar* bar_;
+    LoadingAnimation* load_;
 };
 
 class FinishedView : public View {

@@ -9,13 +9,16 @@ ofApp::ofApp(const char* socket)
 socket_(socket),
 images_(3, Image()),
 previewVideo_(socket_),
+loadingAnimation_(
+    PREVIEW_PHOTO_WIDTH/2 + PREVIEW_X - LOADING_W/2,
+    PREVIEW_PHOTO_HEIGHT/2 + PREVIEW_Y - LOADING_H/2),
 preview_(&previewVideo_),
-pending_(&photoBar_, &previewVideo_),
-processing_(&photoBar_) {};
+pending_(&photoBar_, &previewVideo_, &loadingAnimation_),
+processing_(&photoBar_, &loadingAnimation_) {};
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    ofBackground(200);
+    ofBackground(255);
     ofSetColor(255);
     ofTrueTypeFont::setGlobalDpi(72);
     ofSetVerticalSync(true);
@@ -28,6 +31,8 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
     photoBar_.update(images_);
+    loadingAnimation_.setVisible(false);
+    loadingAnimation_.update();
     switch (mode_) {
         case PENDING:
             previewVideo_.update();
@@ -46,7 +51,6 @@ void ofApp::update(){
         default:
             break;
     }
-
 }
 
 //--------------------------------------------------------------
@@ -73,6 +77,7 @@ void ofApp::draw(){
             error_.draw();
             break;
     }
+    loadingAnimation_.draw();
 }
 
 void updateImageIfChanged(const string& newPath,

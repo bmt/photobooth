@@ -34,6 +34,7 @@ private:
     string timeRemaining_;
     vector<Image> images_;
     VideoGrabber previewVideo_;
+    LoadingAnimation loadingAnimation_;
     Image finalImage_;
 
     // View objects

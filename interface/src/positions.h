@@ -23,5 +23,7 @@
 #define PHOTOBAR_PHOTO_WIDTH 300
 #define PHOTOBAR_PHOTO_HEIGHT 225
 #define PHOTOBAR_MARGIN 10
+#define LOADING_W 50
+#define LOADING_H 50
 
 #endif /* positions_h */
