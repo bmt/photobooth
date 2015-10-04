@@ -15,31 +15,6 @@ var debounceThresholdMillis = 200;
 var Panel = function() {
   this.lastCmd = new Date();
 
-  this.cleanup = function() {
-    activate && activate.unexport();
-    reset && reset.unexport();
-  }
-
-  this.reset = function() {
-    if (new Date() - this.lastCmd < debounceThresholdMillis) {
-      debug('Debounced reset signal.');
-      return;
-    }
-    debug('Received reset signal.');
-    this.lastCmd = new Date();
-    this.emit('reset');
-  }
-
-  this.activate = function() {
-    if (new Date() - this.lastCmd < debounceThresholdMillis) {
-      debug('Debounced activate signal.');
-      return;
-    }
-    debug('Received activate signal.');
-    this.lastCmd = new Date();
-    this.emit('activate');
-  }
-
   // Listen for signals (on non-raspberry pi platorms).
   process.on('SIGUSR1', this.activate.bind(this));
   process.on('SIGUSR2', this.reset.bind(this));
@@ -54,7 +29,33 @@ var Panel = function() {
     var reset = new onoff.Gpio(22, 'in', 'rising');
     reset.watch(this.reset.bind(this));
   }
-}
+
+  this.cleanup = function() {
+    activate && activate.unexport();
+    reset && reset.unexport();
+  }
+};
 util.inherits(Panel, events.EventEmitter);
+
+Panel.prototype.reset = function() {
+  if (new Date() - this.lastCmd < debounceThresholdMillis) {
+    debug('Debounced reset signal.');
+    return;
+  }
+  debug('Received reset signal.');
+  this.lastCmd = new Date();
+  this.emit('reset');
+};
+
+Panel.prototype.activate = function() {
+  if (new Date() - this.lastCmd < debounceThresholdMillis) {
+    debug('Debounced activate signal.');
+    return;
+  }
+  debug('Received activate signal.');
+  this.lastCmd = new Date();
+  this.emit('activate');
+};
+
 
 module.exports = Panel;
