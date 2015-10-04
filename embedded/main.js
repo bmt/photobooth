@@ -89,11 +89,7 @@ function preview() {
 
 function pending() {
   transition('pending');
-  var secondsRemaining = config.countdown.initial;
-  if (photos.length) {
-    secondsRemaining = config.countdown.others;
-  }
-
+  var secondsRemaining = config.countdown;
   previewInstance = camera.openPreview();
   previewServer.setSourceStream(previewInstance.stream);
 

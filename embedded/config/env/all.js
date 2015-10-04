@@ -1,10 +1,7 @@
 'use strict';
 
 module.exports = {
-  countdown: {
-    initial: 5,
-    others: 10
-  },
+  countdown: 5,
   frontend: {
     host: 'http://localhost:3000',
   },
