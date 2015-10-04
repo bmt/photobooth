@@ -102,8 +102,8 @@ function pending() {
   // Count down to 0.
   function tick() {
     --secondsRemaining;
+    updateUI();
     if (secondsRemaining) {
-      updateUI();
       pendingTimeout = setTimeout(tick, 1000);
     } else {
       capture();
