@@ -11,6 +11,7 @@ module.exports = {
     // path: './bin/pbInterface.app/Contents/MacOS/pbInterface'
     // TODO: Bundle the fonts properly so the stand-alone binary works.
     path: '../interface/bin/pbInterfaceDebug.app/Contents/MacOS/pbInterfaceDebug'
+    maxRestarts: 5
   },
 	google: {
 		clientID: process.env.GOOGLE_ID || 'APP_ID',

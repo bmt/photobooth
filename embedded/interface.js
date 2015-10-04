@@ -17,55 +17,83 @@ var InterfaceMode = {
 }
 
 var Interface = function(socket) {
+  this.restartCount_ = 0;
+  this.socket = socket;
+  this.process = null;
+  this.spawnInterfaceProcess();
+};
+
+Interface.prototype.spawnInterfaceProcess = function() {
   // Start the process
-  var uiProcess = spawn(config.interface.path, [socket]);
+  var p = spawn(config.interface.path, [this.socket]);
+  p.on('error', this.onError.bind(this));
+  p.on('exit', this.onExit.bind(this));
+  p.stdin.on('error', function() {process.exit(0)});
+  p.stdout.on('error', function() {process.exit(0)});
+  p.stdout.pipe(process.stdout);
+  p.stderr.pipe(process.stderr);
+  this.process = process;
+};
 
-  uiProcess.on('error', function(err) {
-    console.trace(err);
-  });
+Interface.prototype.onError = function(err) {
+  console.error('Interface failure.');
+  console.trace(err);
+  this.process = null;
+};
 
-  // TODO: Figure out what to do when interface exits.
-  uiProcess.on('exit', function() {
-    console.error('interface exited');
-  });
+Interface.prototype.onExit = function() {
+  console.error('interface exited.');
+  this.process = null;
+  this.restart();
+};
 
-  uiProcess.stdout.pipe(process.stdout);
-  uiProcess.stderr.pipe(process.stderr);
-
-  function sendCommand(mode, args) {
-    var cmd = mode;
-    if (args) {
-      cmd += '\t';
-      cmd += args.join('\t');
-    }
-    debug('Cmd: ' + cmd);
-    uiProcess.stdin.write(cmd + '\n');
+Interface.prototype.restart = function() {
+  this.restartCount_++;
+  if (this.restartCount_ <= config.interface.maxRestarts) {
+    debug('Attempting restart,  attempt ' + this.restartCount_);
+    this.spawnInterfaceProcess();
+  } else {
+    console.error('Interface failure: too many restarts.');
   }
+};
 
-  this.idle = function() {
-    sendCommand(InterfaceMode.IDLE);
-  };
+Interface.prototype.sendCommand = function(mode, args) {
+  var cmd = mode;
+  if (args) {
+    cmd += '\t';
+    cmd += args.join('\t');
+  }
+  debug('Cmd: ' + cmd);
+  if (this.process) {
+    this.process.stdin.write(cmd + '\n');
+  } else {
+    console.error('Interface process not availble.');
+  }
+}
 
-  this.preview = function() {
-    sendCommand(InterfaceMode.PREVIEW);
-  };
+Interface.prototype.idle = function() {
+  this.sendCommand(InterfaceMode.IDLE);
+};
 
-  this.pending = function(time, images) {
-    sendCommand(InterfaceMode.PENDING,
-        _.flatten([time, images]));
-  };
+Interface.prototype.preview = function() {
+  this.sendCommand(InterfaceMode.PREVIEW);
+};
 
-  this.processing = function(images) {
-    sendCommand(InterfaceMode.PROCESSING, images);
-  };
+Interface.prototype.pending = function(time, images) {
+  this.sendCommand(InterfaceMode.PENDING,
+      _.flatten([time, images]));
+};
 
-  this.finished = function(image) {
-    sendCommand(InterfaceMode.FINISHED, [image]);
-  };
+Interface.prototype.processing = function(images) {
+  this.sendCommand(InterfaceMode.PROCESSING, images);
+};
 
-  this.error = function() {
-    sendCommand(InterfaceMode.ERROR);
-  };
+Interface.prototype.finished = function(image) {
+  sendCommand(InterfaceMode.FINISHED, [image]);
+};
+
+Interface.prototype.error = function() {
+  sendCommand(InterfaceMode.ERROR);
 };
 
 module.exports = Interface;
