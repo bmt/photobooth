@@ -173,7 +173,6 @@ var Photobooth = function(panel, camera, ui, server) {
     ui.processing(photos);
     joinImages(photos)
       .then(function(path) {
-        debug('GM Finished: ' + path);
         finishedPhoto = path;
         return promise.resolve(path);
       }).then(uploadToStorage)
