@@ -3,6 +3,7 @@
   "description": "Embedded photobooth module.",
   "version": "0.0.1",
   "author": "Brian Turnbull",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git://github.com/bmt/photobooth.git"
@@ -11,6 +12,13 @@
     "node": "0.12.x",
     "npm": "1.4.x"
   },
+  "scripts": {
+    "lint": "node_modules/jshint/bin/jshint .",
+    "validate": "npm ls"
+  },
+  "pre-commit": [
+    "lint"
+  ],
   "dependencies": {
     "bluebird": "^2.10.0",
     "chalk": "^1.1.1",
@@ -24,5 +32,10 @@
     "process": "^0.11.2",
     "request-promise": "^0.4.3",
     "tmp": "0.0.27"
+  },
+  "devDependencies": {
+    "jshint": "^2.8.0",
+    "pre-commit": "^1.0.10",
+    "precommit-hook": "^3.0.0"
   }
 }
