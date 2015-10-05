@@ -216,24 +216,84 @@ function forever() {
 }
 
 // On exit.
-function onExit() {
-  // TODO: shutdown interface before exiting
+function onExit(opt_code) {
+  if (opt_code == undefined) {
+    opt_code = 1;
+  }
   previewServer.close();
-  process.exit(1);
+  ui.close();
+  process.exit(opt_code);
 }
 process.on('SIGINT', onExit);
 process.on('exit', onExit);
+
+function exit(opt_code) {
+  onExit(opt_code);
+}
 
 // Log uncaught exceptions
 process.on('uncaughtException', function (err) {
   console.error((new Date).toUTCString() + ' uncaughtException:', err.message)
   console.error(err.stack)
-  onExit();
-  process.exit(1)
+  exit(1);
 });
 
+// Runs a test graphicsmagick command to make sure it is installed.
+function verifyGm() {
+  var defer = promise.pending();
+  debug('Testing graphicsmagick.');
+  gm("cameras/testdata/0.jpg").identify(function(err, value) {
+    if (err) {
+      console.trace(err);
+      console.error('Unable to verify graphicsmagic -- is it installed?');
+      defer.reject();
+    } else {
+      debug('Graphicsmagic OK.');
+      defer.resolve();
+    }
+  });
+  return defer.promise;
+}
+
+function verifyInterface() {
+  var defer = promise.pending();
+  fs.access(config.interface.path, fs.X_OK, function(err) {
+    if (err) {
+      console.trace(err);
+      console.error('Interface not executable: ' + config.interface.path);
+      defer.reject();
+    }
+    defer.resolve();
+  });
+  return defer.promise;
+}
+
+function verifyFrontend() {
+  // TODO: Verify that frontend is available where configured.
+  return promise.resolve();
+}
+
+function verifyCloudStorage() {
+  // TODO: Verify cloud storage is available.
+  return promise.resolve();
+}
 
 if (require.main === module) {
-  init();
-  forever();
+  var checks = [
+    verifyInterface(),
+    verifyGm(),
+    verifyFrontend(),
+    verifyCloudStorage()
+  ];
+  promise.all(checks).then(function() {
+    debug('Initializing.');
+    ui.start();
+    init();
+    forever();
+  }, function(err) {
+    if (err) {
+      console.trace(err);
+    }
+    exit(1);
+  });
 }

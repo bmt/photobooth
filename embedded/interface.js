@@ -20,7 +20,19 @@ var Interface = function(socket) {
   this.restartCount_ = 0;
   this.socket = socket;
   this.process = null;
+  this.stopped = false;
+};
+
+Interface.prototype.start = function() {
+  this.stopped = false;
   this.spawnInterfaceProcess();
+};
+
+Interface.prototype.close = function() {
+  this.stopped = true;
+  if (this.process) {
+    this.process.kill();
+  }
 };
 
 Interface.prototype.spawnInterfaceProcess = function() {
@@ -32,7 +44,7 @@ Interface.prototype.spawnInterfaceProcess = function() {
   p.stdout.on('error', function() {process.exit(0)});
   p.stdout.pipe(process.stdout);
   p.stderr.pipe(process.stderr);
-  this.process = process;
+  this.process = p;
 };
 
 Interface.prototype.onError = function(err) {
@@ -44,7 +56,9 @@ Interface.prototype.onError = function(err) {
 Interface.prototype.onExit = function() {
   console.error('interface exited.');
   this.process = null;
-  this.restart();
+  if (!this.stopped) {
+    this.restart();
+  }
 };
 
 Interface.prototype.restart = function() {
@@ -89,11 +103,11 @@ Interface.prototype.processing = function(images) {
 };
 
 Interface.prototype.finished = function(image) {
-  sendCommand(InterfaceMode.FINISHED, [image]);
+  this.sendCommand(InterfaceMode.FINISHED, [image]);
 };
 
 Interface.prototype.error = function() {
-  sendCommand(InterfaceMode.ERROR);
+  this.sendCommand(InterfaceMode.ERROR);
 };
 
 module.exports = Interface;
