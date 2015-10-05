@@ -24,4 +24,4 @@ module.exports = function() {
   // Fall back to fake camera.
   console.info('No camera found, falling back to fake camera.');
   return new FileCamera();
-}
+};

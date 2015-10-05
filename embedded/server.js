@@ -1,5 +1,6 @@
+'use strict';
+
 var net = require('net'),
-    fs = require('fs'),
     tmp = require('tmp'),
     _ = require('lodash'),
     debug = require('debug')('server');
@@ -28,7 +29,7 @@ var Server = function() {
 
   this.getSocket = function() {
     return socket;
-  }
+  };
 
   server.listen(socket, function() {
     debug('Server listening to path: ' + socket);
@@ -44,13 +45,13 @@ var Server = function() {
         src.pipe(c, {end: false});
       });
     }
-  }
+  };
 
   this.close = function() {
     server.close(function() {
       debug('Server shutdown.');
     });
-  }
+  };
 };
 
 module.exports = Server;

@@ -14,7 +14,7 @@ var InterfaceMode = {
   FINISHED: '4',
   ERROR: '5',
   UNKNOWN: '6',
-}
+};
 
 var Interface = function(socket) {
   this.restartCount_ = 0;
@@ -40,8 +40,12 @@ Interface.prototype.spawnInterfaceProcess = function() {
   var p = spawn(config.interface.path, [this.socket]);
   p.on('error', this.onError.bind(this));
   p.on('exit', this.onExit.bind(this));
-  p.stdin.on('error', function() {process.exit(0)});
-  p.stdout.on('error', function() {process.exit(0)});
+  p.stdin.on('error', function() {
+    process.exit(0);
+  });
+  p.stdout.on('error', function() {
+    process.exit(0);
+  });
   p.stdout.pipe(process.stdout);
   p.stderr.pipe(process.stderr);
   this.process = p;
@@ -83,7 +87,7 @@ Interface.prototype.sendCommand = function(mode, args) {
   } else {
     console.error('Interface process not availble.');
   }
-}
+};
 
 Interface.prototype.idle = function() {
   this.sendCommand(InterfaceMode.IDLE);

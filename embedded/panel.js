@@ -19,7 +19,7 @@ var Panel = function() {
   process.on('SIGUSR1', this.activate.bind(this));
   process.on('SIGUSR2', this.reset.bind(this));
 
-  // TODO: Make sure this works on Raspberry pi.
+  // Listen for gpio edges on raspberry pi.
   if (onoff) {
     // Pin 6
     var activate = new onoff.Gpio(17, 'in', 'rising');
@@ -31,9 +31,14 @@ var Panel = function() {
   }
 
   this.cleanup = function() {
-    activate && activate.unexport();
-    reset && reset.unexport();
-  }
+    if (activate) {
+      activate.unexport();
+    }
+
+    if (reset) {
+      reset.unexport();
+    }
+  };
 };
 util.inherits(Panel, events.EventEmitter);
 
