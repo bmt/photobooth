@@ -17,6 +17,15 @@ Canon.isPresent = function() {
   return false;
 };
 
+// Returns a promise.
+Canon.prototype.reset = function() {
+  if (this.preview) {
+    return this.preview.close();
+  } else {
+    return promise.resolve();
+  }
+};
+
 Canon.prototype.takePhoto = function() {
   function takePhotoImpl() {
     var deferred = promise.pending();
@@ -40,11 +49,7 @@ Canon.prototype.takePhoto = function() {
   }
 
   // TODO: Refactor this into a subclass.
-  if (this.preview) {
-    return this.preview.close().then(takePhotoImpl.bind(this));
-  } else {
-    return takePhotoImpl();
-  }
+  return this.reset().then(takePhotoImpl.bind(this));
 };
 
 Canon.prototype.openPreview = function() {

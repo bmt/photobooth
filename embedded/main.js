@@ -33,9 +33,9 @@ function onExit(opt_code) {
   server.close();
   panel.cleanup();
   ui.close();
-  // TODO: implement this.
-  //camera.reset();
-  process.exit(opt_code);
+  camera.reset().then(function() {
+    process.exit(opt_code);
+  });
 }
 process.on('SIGINT', onExit);
 process.on('exit', onExit);

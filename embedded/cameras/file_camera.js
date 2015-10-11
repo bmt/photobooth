@@ -10,6 +10,14 @@ var FileCamera = function() {
   this.preview = null;
 };
 
+FileCamera.prototype.reset = function() {
+  if (this.preview) {
+    return this.preview.close();
+  } else {
+    return promise.resolve();
+  }
+};
+
 FileCamera.prototype.takePhoto = function() {
   var camera = this;
   function takePhotoImpl() {
@@ -30,11 +38,7 @@ FileCamera.prototype.takePhoto = function() {
   }
 
   // TODO: Refactor this into a subclass.
-  if (this.preview) {
-    return this.preview.close().then(takePhotoImpl);
-  } else {
-    return takePhotoImpl();
-  }
+  return this.reset().then(takePhotoImpl.bind(this));
 };
 
 FileCamera.prototype.openPreview = function() {
