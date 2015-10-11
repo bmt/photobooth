@@ -7,8 +7,13 @@ var config = require('./config/config'),
     debug = require('debug')('main'),
     process = require('process'),
     fs = require('fs'),
+    gcloud = require('gcloud')({
+      projectId: config.google.project,
+      keyFilename: config.google.keyFilename,
+    }),
     gm = require('gm'),
     getCamera = require('./cameras/factory'),
+    request = require('request-promise'),
     Panel = require('./panel'),
     Server = require('./server'),
     Interface = require('./interface'),
@@ -84,12 +89,29 @@ function verifyInterface() {
 }
 
 function verifyFrontend() {
-  // TODO: Verify that frontend is available where configured.
-  return promise.resolve();
+  debug('Verifying frontend configuration.');
+  return request.get(config.frontend.host).then(function(data) {
+    debug('Frontend OK')
+    return data;
+  }, function(err) {
+    console.trace(err);
+    throw new Error('Frontend not available ' + config.frontend.host);
+  });
 }
 
 function verifyCloudStorage() {
-  // TODO: Verify cloud storage is available.
+  debug('Verifying google cloud storage connection.');
+  var defer = promise.pending();
+  var gcs = gcloud.storage();
+  var bucket = gcs.getBuckets(function(err, buckets) {
+    if (err) {
+      console.trace(err)
+      defer.reject(new Error('Cloud storage not available'));
+    } else {
+      debug('Cloud storage OK');
+      defer.resolve();
+    }
+  });
   return promise.resolve();
 }
 
