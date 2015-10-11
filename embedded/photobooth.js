@@ -28,7 +28,6 @@ function joinImages(photos) {
       .in('+10+10')
       .in(photos[0])
       .in(photos[1])
-      .resize('1220')
       .write(destPath, function() {
         deferred.resolve(destPath);
       });
