@@ -9,6 +9,7 @@ var config = require('./config/config'),
       keyFilename: config.google.keyFilename,
     }),
     gm = require('gm'),
+    moment = require('moment'),
     request = require('request-promise'),
     tmp = require('tmp');
 
@@ -40,9 +41,13 @@ function uploadToStorage(path) {
   var deferred = promise.pending();
   var gcs = gcloud.storage();
   var bucket = gcs.bucket(config.google.storageBucket);
-  // TODO: Better file name (no tmp in name)
-  //       Better bucket name (no bmt in bucket name)
-  bucket.upload(path, function(err, file) {
+
+  var filename = ('photobooth-' +
+      moment().format('YYYYMMDD-hhmmss-SSS' + '.jpg'));
+  var options = {
+    destination: filename
+  };
+  bucket.upload(path, options, function(err, file) {
     if (err) {
       deferred.reject(err);
     } else {
