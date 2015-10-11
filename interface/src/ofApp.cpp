@@ -88,7 +88,17 @@ void updateImageIfChanged(const string& newPath,
     newImg->path = newPath;
     if (newPath.size() && current.path != newPath) {
         newImg->preLoad(newPath);
-        newImg->image->resize(width, height);
+        if (width > 0 && height > 0) {
+          newImg->image->resize(width, height);
+        } else if (width > 0) {
+          float ratio = width / newImg->image->getWidth(); 
+          float newHeight = ratio * newImg->image->getHeight();
+          newImg->image->resize(width, newHeight);
+        } else if (height > 0) {
+          float ratio = height / newImg->image->getHeight(); 
+          float newWidth = ratio * newImg->image->getWidth();
+          newImg->image->resize(newWidth, height);
+        }
     }
 }
 
@@ -139,7 +149,7 @@ void ofApp::commandReceived(Command& cmd) {
                                 &(newImages[i]));
     }
     updateImageIfChanged(finalPath, finalImage_,
-                            0, 0, &newFinalImage);
+                         FINAL_PHOTO_WIDTH, 0, &newFinalImage);
     // TODO: grab a mutex
 
     // Apply any changes to images.
