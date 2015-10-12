@@ -65,11 +65,11 @@ function recordInFrontend(storageInfo) {
 
 function printReceipt(photo) {
   debug('Printing receipt.');
-  console.info('Photo available at: ' + config.frontend.host +
-      '#!/photo/' + photo._id);
+  var url = config.frontend.host + '/' + photo._id;
+  console.info('Photo available at: ' + url);
 
   // TODO: Print receipt
-  return promise.resolve();
+  return promise.resolve(url);
 }
 
 var Photobooth = function(panel, camera, ui, server) {
@@ -194,9 +194,9 @@ var Photobooth = function(panel, camera, ui, server) {
   }
 
   // State -> finished
-  function finished() {
+  function finished(url) {
     transition('finished');
-    ui.finished(finishedPhoto);
+    ui.finished(finishedPhoto, url);
     pendingTimeout = setTimeout(idle, 1000*60*1);
     panel.on('activate', preview);
   }

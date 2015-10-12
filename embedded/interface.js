@@ -106,8 +106,8 @@ Interface.prototype.processing = function(images) {
   this.sendCommand(InterfaceMode.PROCESSING, images);
 };
 
-Interface.prototype.finished = function(image) {
-  this.sendCommand(InterfaceMode.FINISHED, [image]);
+Interface.prototype.finished = function(image, url) {
+  this.sendCommand(InterfaceMode.FINISHED, [image, url]);
 };
 
 Interface.prototype.error = function() {
