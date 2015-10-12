@@ -159,11 +159,15 @@ private:
 
 class FinishedView : public View {
 public:
-    FinishedView() : View() {};
+    FinishedView() : View() {
+        font_.loadFont("verdana.ttf", 36, true, true);
+    };
     virtual void draw();
-    virtual void update(const Image& image);
+    virtual void update(const Image& image, const string& shareUrl);
 private:
     Image image_;
+    string shareUrl_;
+    ofTrueTypeFont font_;
 };
 
 class ErrorView : public View {

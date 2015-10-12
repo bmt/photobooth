@@ -36,6 +36,7 @@ private:
     VideoGrabber previewVideo_;
     LoadingAnimation loadingAnimation_;
     Image finalImage_;
+    string shareUrl_;
 
     // View objects
     PhotoBar photoBar_;

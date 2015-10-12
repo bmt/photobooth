@@ -39,7 +39,7 @@ void ofApp::update(){
             pending_.update(timeRemaining_);
             break;
         case FINISHED:
-            finished_.update(finalImage_);
+            finished_.update(finalImage_, shareUrl_);
             break;
         case PREVIEW:
             previewVideo_.update();
@@ -110,7 +110,7 @@ void swapImageIfChanged(Image* current, Image* newImg) {
 
 void ofApp::commandReceived(Command& cmd) {
     vector<string> imgPaths(3, "");
-    string timeRemaining, finalPath;
+    string timeRemaining, finalPath, finalUrl;
     switch(cmd.mode) {
         case PENDING:
             if (cmd.args.size() > 0) {
@@ -126,6 +126,9 @@ void ofApp::commandReceived(Command& cmd) {
         case FINISHED:
             if (cmd.args.size() > 0) {
                 finalPath = cmd.args[0];
+            }
+            if (cmd.args.size() > 1) {
+                finalUrl = cmd.args[1];
             }
         case IDLE:
         case PREVIEW:
@@ -159,6 +162,7 @@ void ofApp::commandReceived(Command& cmd) {
     swapImageIfChanged(&finalImage_, &newFinalImage);
     mode_ = cmd.mode;
     timeRemaining_ = timeRemaining;
+    shareUrl_ = finalUrl;
 
     // TODO: release mutex
 }
