@@ -46,6 +46,23 @@ describe('Photo CRUD tests', function() {
 		});
 	});
 
+  it('should redirect to the photo view page', function(done) {
+    // Save a new photo
+    agent.post('/photos')
+      .send(photo)
+      .expect(200)
+      .end(function(err, res) {
+        if (err) done(err);
+        var photoId = res.body._id;
+        agent.get('/' + photoId)
+          .expect(302)
+          .end(function(err, res) {
+            res.header.location.should.match('/#!/photo/' + photoId);
+            done();
+          });
+      });
+  });
+
 	it('should be able to upload with valid booth', function(done) {
     // Save a new photo
     // TODO: Add a booth to this photo.

@@ -15,6 +15,11 @@ module.exports = function(app) {
     .get(photos.get)
     .delete(users.requiresLogin, photos.canDelete, photos.delete);
 
+  app.route('/:photoId')
+    .get(function(req, res) {
+      res.redirect('/#!/photo/' + req.params.photoId);
+    });
+
 	// Finish by binding the photo middleware
 	app.param('photoId', photos.photoById);
 };
