@@ -1,7 +1,7 @@
 'use strict';
 var Canon = require('./canon'),
     Logitech = require('./logitech'),
-    FileCamera = require('./file_camera');
+    FakeCamera = require('./fake_camera');
 
 module.exports = function() {
   console.info('Checking for available cameras.');
@@ -23,5 +23,5 @@ module.exports = function() {
 
   // Fall back to fake camera.
   console.info('No camera found, falling back to fake camera.');
-  return new FileCamera();
+  return new FakeCamera();
 };

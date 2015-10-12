@@ -5,12 +5,12 @@ var promise = require('bluebird'),
     tmp = require('tmp'),
     PreviewHandle = require('./previewHandle');
 
-var FileCamera = function() {
+var FakeCamera = function() {
   this.nextPhoto = 0;
   this.preview = null;
 };
 
-FileCamera.prototype.reset = function() {
+FakeCamera.prototype.reset = function() {
   if (this.preview) {
     return this.preview.close();
   } else {
@@ -18,7 +18,7 @@ FileCamera.prototype.reset = function() {
   }
 };
 
-FileCamera.prototype.takePhoto = function() {
+FakeCamera.prototype.takePhoto = function() {
   var camera = this;
   function takePhotoImpl() {
     var deferred = promise.pending();
@@ -41,7 +41,7 @@ FileCamera.prototype.takePhoto = function() {
   return this.reset().then(takePhotoImpl.bind(this));
 };
 
-FileCamera.prototype.openPreview = function() {
+FakeCamera.prototype.openPreview = function() {
   if (this.preview && this.preview.open) {
     return this.preview;
   }
@@ -53,8 +53,8 @@ FileCamera.prototype.openPreview = function() {
 };
 
 // Static
-FileCamera.isPresent = function() {
+FakeCamera.isPresent = function() {
   return true;
 };
 
-module.exports = FileCamera;
+module.exports = FakeCamera;
