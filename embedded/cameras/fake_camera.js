@@ -3,53 +3,38 @@
 var promise = require('bluebird'),
     fs = require('fs'),
     tmp = require('tmp'),
+    util = require('util'),
+    Camera = require('./camera'),
     PreviewHandle = require('./previewHandle');
 
 var FakeCamera = function() {
+  Camera.call(this);
   this.nextPhoto = 0;
   this.preview = null;
 };
+util.inherits(FakeCamera, Camera);
 
-FakeCamera.prototype.reset = function() {
-  if (this.preview) {
-    return this.preview.close();
-  } else {
-    return promise.resolve();
-  }
-};
-
-FakeCamera.prototype.takePhoto = function() {
-  var camera = this;
-  function takePhotoImpl() {
-    var deferred = promise.pending();
-    var srcPath = 'cameras/testdata/' + camera.nextPhoto + '.jpg';
-    tmp.tmpName(function(err, path) {
-      var src = fs.createReadStream(srcPath);
-      var imgpath = path + '.jpg';
-      var target = fs.createWriteStream(imgpath);
-      src.pipe(target, {end: false});
-      src.on('close', function() {
-        // Simulate camera delay.
-        setTimeout(deferred.resolve.bind(deferred, imgpath), 2000);
-      });
+FakeCamera.prototype.takePhotoImpl = function() {
+  var deferred = promise.pending();
+  var srcPath = 'cameras/testdata/' + this.nextPhoto + '.jpg';
+  tmp.tmpName(function(err, path) {
+    var src = fs.createReadStream(srcPath);
+    var imgpath = path + '.jpg';
+    var target = fs.createWriteStream(imgpath);
+    src.pipe(target, {end: false});
+    src.on('close', function() {
+      // Simulate camera delay.
+      setTimeout(deferred.resolve.bind(deferred, imgpath), 2000);
     });
-    camera.nextPhoto = ++camera.nextPhoto % 3;
-    return deferred.promise;
-  }
-
-  // TODO: Refactor this into a subclass.
-  return this.reset().then(takePhotoImpl.bind(this));
+  });
+  this.nextPhoto = ++this.nextPhoto % 3;
+  return deferred.promise;
 };
 
-FakeCamera.prototype.openPreview = function() {
-  if (this.preview && this.preview.open) {
-    return this.preview;
-  }
+FakeCamera.prototype.openPreviewImpl = function() {
   var srcPath = 'cameras/testdata/movie.mjpg';
   // TODO: Continually read the file over and over again.
-  var fileStream = fs.createReadStream(srcPath);
-  this.preview = new PreviewHandle(fileStream);
-  return this.preview;
+  return new PreviewHandle(fs.createReadStream(srcPath));
 };
 
 // Static
