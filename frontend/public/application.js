@@ -10,34 +10,22 @@ angular.module(ApplicationConfiguration.applicationModuleName).config(['$locatio
 	}
 ]);
 
-var app = angular.module('plunker', ['ui.router', 'photos']);
-app.config(       ['$stateProvider', 'statesPhotos',
-           function($stateProvider,   statesPhotos){
-    $stateProvider
-    .state('home',{ ... })
-    .state('root.home', { ... })
-    .state('home.photos', { ... })
-    angular.forEach(statesContact, function(state) {
-      $stateProvider.state(state.name, state.options);
-    })
-}]);
+// Include Facebook SDK. appId needs to be updated when there is a url for app.
+ window.fbAsyncInit = function() {
+   FB.init({
+     appId      : '1528406254116477',
+     xfbml      : true,
+     version    : 'v2.5'
+   });
+ };
 
-// Facebook SDK, appId needs updating when there is a url for app
-  window.fbAsyncInit = function() {
-    FB.init({
-      appId      : '1528406254116477',
-      xfbml      : true,
-      version    : 'v2.5'
-    });
-  };
-
-  (function(d, s, id){
-     var js, fjs = d.getElementsByTagName(s)[0];
-     if (d.getElementById(id)) {return;}
-     js = d.createElement(s); js.id = id;
-     js.src = "//connect.facebook.net/en_US/sdk.js";
-     fjs.parentNode.insertBefore(js, fjs);
-   }(document, 'script', 'facebook-jssdk'));
+ (function(d, s, id){
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) {return;}
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
 
 
 //Then define the init function for starting up the application
