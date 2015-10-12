@@ -1,7 +1,4 @@
 <section data-ng-controller="PhotosController" data-ng-init="findOne()">
-
   <img class="final-photo" ng-if="photo" src="http://storage.googleapis.com/{{photo.bucket}}/{{photo.name}}">
-
   <div class="fb-like" data-href="http://storage.googleapis.com/{{photo.bucket}}/{{photo.name}}" data-layout="button" data-action="like" data-show-faces="true" data-share="true"></div>
-
 </section>
