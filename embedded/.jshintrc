@@ -1,0 +1,16 @@
+{
+  "strict": true,
+  "-W058": true,  /* Disable 'Missing () invoking a constructor' */
+  "newcap": false,
+  "curly": true,
+  "funcscope": true,
+  "nocomma": true,
+  "noarg": true,
+  "nonbsp": true,
+  "nonew": true,
+  "shadow": false,
+  "singleGroups": true,
+  "unused": "vars",
+  "node": true,
+  "esnext": true
+}
