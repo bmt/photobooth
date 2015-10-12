@@ -4,9 +4,15 @@
  * Module dependencies.
  */
 var mongoose = require('mongoose'),
-	Schema = mongoose.Schema;
+	Schema = mongoose.Schema,
+  shortid = require('shortid');
 
 var PhotoSchema = new Schema({
+  _id: {
+    type: String,
+    unique: true,
+    'default': shortid.generate
+  },
 	created: {
 		type: Date,
 		default: Date.now

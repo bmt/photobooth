@@ -120,15 +120,20 @@ void ProcessingView::draw() {
     ofPopStyle();
 }
 
-void FinishedView::update(const Image& image) {
+void FinishedView::update(const Image& image, const string& shareUrl) {
     if (image_.path != image.path) {
         image_ = image;
         image_.update();
     }
+    shareUrl_ = shareUrl;
 }
 
 void FinishedView::draw() {
     image_.draw(FINAL_PHOTO_X, FINAL_PHOTO_Y);
+    ofPushStyle();
+    ofSetColor(0);
+    font_.drawString(shareUrl_, SHARE_URL_X, SHARE_URL_Y);
+    ofPopStyle();
 }
 
 void ErrorView::draw() {

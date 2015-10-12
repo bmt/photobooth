@@ -3,9 +3,6 @@
 var promise = require('bluebird'),
     fs = require('fs'),
     tmp = require('tmp'),
-    debug = require('debug')('camera'),
-    stream = require('stream'),
-    util = require('util'),
     PreviewHandle = require('./previewHandle');
 
 var FileCamera = function() {
@@ -13,11 +10,20 @@ var FileCamera = function() {
   this.preview = null;
 };
 
+FileCamera.prototype.reset = function() {
+  if (this.preview) {
+    return this.preview.close();
+  } else {
+    return promise.resolve();
+  }
+};
+
 FileCamera.prototype.takePhoto = function() {
+  var camera = this;
   function takePhotoImpl() {
     var deferred = promise.pending();
-    var srcPath = 'cameras/testdata/' + this.nextPhoto + '.jpg';
-    var tmpfile = tmp.tmpName(function(err, path) {
+    var srcPath = 'cameras/testdata/' + camera.nextPhoto + '.jpg';
+    tmp.tmpName(function(err, path) {
       var src = fs.createReadStream(srcPath);
       var imgpath = path + '.jpg';
       var target = fs.createWriteStream(imgpath);
@@ -27,16 +33,12 @@ FileCamera.prototype.takePhoto = function() {
         setTimeout(deferred.resolve.bind(deferred, imgpath), 2000);
       });
     });
-    this.nextPhoto = ++this.nextPhoto % 3;
+    camera.nextPhoto = ++camera.nextPhoto % 3;
     return deferred.promise;
   }
 
   // TODO: Refactor this into a subclass.
-  if (this.preview) {
-    return this.preview.close().then(takePhotoImpl.bind(this));
-  } else {
-    return takePhotoImpl();
-  }
+  return this.reset().then(takePhotoImpl.bind(this));
 };
 
 FileCamera.prototype.openPreview = function() {

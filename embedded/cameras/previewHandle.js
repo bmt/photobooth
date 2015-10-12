@@ -21,5 +21,5 @@ module.exports = function(stream, process) {
     } else {
       return promise.resolve();
     }
-  }
+  };
 };

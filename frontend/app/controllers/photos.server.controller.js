@@ -85,12 +85,6 @@ exports.canDelete = function(req, res, next) {
 };
 
 exports.photoById = function(req, res, next, id) {
-	if (!mongoose.Types.ObjectId.isValid(id)) {
-		return res.status(400).send({
-			message: 'Photo is invalid'
-		});
-	}
-
 	Photo.findById(id).exec(function(err, photo) {
 		if (err) return next(err);
 		if (!photo) {
