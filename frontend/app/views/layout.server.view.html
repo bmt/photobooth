@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<html ng-app lang="en" xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
 	<title>{{title}}</title>
@@ -30,13 +30,29 @@
 	<![endif]-->
 </head>
 
-<body class="ng-cloak">
+
+<body ng-app="Photobooth" ng-controller="PhotosController" class="ng-cloak">
+
+
+
+
 	<header data-ng-include="'/modules/core/views/header.client.view.html'" class="navbar navbar-fixed-top"></header>
+
+
 	<section class="content">
 		<section class="container">
-			{% block content %}{% endblock %}
+			<p>Hi Brian, this took me a week and a half.</p>
+
+			<div class="fb-like" data-href="https://developers.facebook.com/docs/plugins/" data-layout="button" data-action="like" data-show-faces="true" data-share="true"></div>
+
+
+			{% block content %}
+				<section data-ui-view></section>
+			{% endblock %}
 		</section>
 	</section>
+
+
 
 	<!--Embedding The User Object-->
 	<script type="text/javascript">
@@ -52,6 +68,10 @@
 	<!--Livereload script rendered -->
 	<script type="text/javascript" src="http://{{request.hostname}}:35729/livereload.js"></script>
 	{% endif %}
+
+
+
+
 
 	<!--[if lt IE 9]>
 	<section class="browsehappy jumbotron hide">
