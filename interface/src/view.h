@@ -135,10 +135,13 @@ public:
         bar_(bar),
         preview_(preview),
         load_(load),
-        timeRemaining_("") {};
+        timeRemaining_("") {
+            font_.loadFont("verdana.ttf", 80, true, true);
+        };
     virtual void draw();
     virtual void update(const string& timeRemaining);
 private:
+    ofTrueTypeFont font_;
     string timeRemaining_;
     PhotoBar* bar_;
     VideoGrabber* preview_;

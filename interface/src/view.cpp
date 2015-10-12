@@ -101,11 +101,11 @@ void PendingView::draw() {
     string output;
     if (timeRemaining_ == "0") {
         load_->setVisible(true);
-        output = "Say Cheese!";
+        defaultFont_.drawString("Say Cheese!", GUTTER, TEXT_Y);
     } else {
-        output = "Time remaining: " + timeRemaining_;
+        ofSetColor(255, 255, 255, 150);
+        font_.drawString(timeRemaining_, COUNTDOWN_X, COUNTDOWN_Y);
     }
-    defaultFont_.drawString(output, GUTTER, TEXT_Y);
     ofPopStyle();
 }
 
@@ -133,6 +133,8 @@ void FinishedView::draw() {
     ofPushStyle();
     ofSetColor(0);
     font_.drawString(shareUrl_, SHARE_URL_X, SHARE_URL_Y);
+    defaultFont_.drawString("Take receipt with share url and scannable QRcode.  Press button to start again.",
+                            SHARE_TEXT_X, SHARE_TEXT_Y);
     ofPopStyle();
 }
 
