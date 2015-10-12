@@ -57,7 +57,7 @@ describe('Photo CRUD tests', function() {
         agent.get('/photos/' + res.body._id)
           .end(function(err, res) {
             var photo = res.body;
-            if (err) done(err);
+            if (err) return done(err);
             photo.bucket.should.match('bucket');
             photo.name.should.match('name');
             // TODO: check created date.
@@ -142,7 +142,7 @@ describe('Photo CRUD tests', function() {
 	it('should return proper error for single photo which doesnt exist', function(done) {
 		request(app).get('/photos/invalidphotoid')
 			.end(function(req, res) {
-				res.body.should.be.an.Object.with.property('message', 'Photo is invalid');
+				res.body.should.be.an.Object.with.property('message', 'Photo not found');
 				done();
 			});
 	});
