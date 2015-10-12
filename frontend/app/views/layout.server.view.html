@@ -31,10 +31,15 @@
 </head>
 
 <body class="ng-cloak">
-	<header data-ng-include="'/modules/core/views/header.client.view.html'" class="navbar navbar-fixed-top"></header>
+
+  <header data-ng-include="'/modules/core/views/header.client.view.html'"
+  class="navbar navbar-fixed-top navbar-inverse"></header>
+
 	<section class="content">
 		<section class="container">
-			{% block content %}{% endblock %}
+			{% block content %}
+				<section data-ui-view></section>
+			{% endblock %}
 		</section>
 	</section>
 
