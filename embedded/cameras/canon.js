@@ -1,11 +1,14 @@
 'use strict';
 
 var promise = require('bluebird'),
+    _ = require('lodash'),
     tmp = require('tmp'),
     util = require('util'),
     debug = require('debug')('camera'),
-    exec = require('child_process').exec,
-    spawn = require('child_process').spawn,
+    child_process = require('child_process'),
+    exec = child_process.exec,
+    spawn = child_process.spawn,
+    spawnSync = child_process.spawnSync,
     Camera = require('./camera'),
     PreviewHandle = require('./previewHandle');
 
@@ -16,8 +19,20 @@ util.inherits(Canon, Camera);
 
 // Static
 Canon.isPresent = function() {
-  // TODO: Implement
-  return false;
+  var output = spawnSync(gphoto, ['--summary']);
+  var stderr = output.stderr.toString('utf8');
+  if (output.error) {
+    console.trace(output.error);
+    return false;
+  } else if (output.status == 0) {
+    // TODO: Check for camera capabilities.
+    return true;
+  } else if (_.contains(stderr, 'Error: No camera found.')) {
+    return false;
+  } else {
+    debug(stderr);
+    return false;
+  }
 };
 
 Canon.prototype.takePhotoImpl = function() {

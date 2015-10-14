@@ -140,22 +140,31 @@ var Photobooth = function(panel, camera, ui, server) {
   // State -> pending
   function pending() {
     transition('pending');
+    // If there are existing photos, send them immediately so they can get
+    // displayed while the camera is resetting.
+    if (photos.length) {
+      ui.pending(0, photos);
+    }
+
     var secondsRemaining = config.countdown;
     previewHandle = camera.openPreview();
     server.setSourceStream(previewHandle.stream);
 
-    // Initialize UI and then count down to zero.
-    ui.pending(secondsRemaining, photos);
-    function tick() {
-      --secondsRemaining;
+    pendingPromise = previewHandle.ready;
+    previewHandle.ready.then(function() {
+      // Initialize UI and then count down to zero.
       ui.pending(secondsRemaining, photos);
-      if (secondsRemaining) {
-        pendingTimeout = setTimeout(tick, 1000);
-      } else {
-        capture();
+      function tick() {
+        --secondsRemaining;
+        ui.pending(secondsRemaining, photos);
+        if (secondsRemaining) {
+          pendingTimeout = setTimeout(tick, 1000);
+        } else {
+          capture();
+        }
       }
-    }
-    pendingTimeout = setTimeout(tick, 1000);
+      pendingTimeout = setTimeout(tick, 1000);
+    });
   }
 
   // State -> capture
@@ -174,13 +183,23 @@ var Photobooth = function(panel, camera, ui, server) {
   // State -> processing
   function processing() {
     transition('processing');
-    ui.processing(photos);
+    ui.processing(photos, "Composing images");
     joinImages(photos)
       .then(function(path) {
         finishedPhoto = path;
         return promise.resolve(path);
-      }).then(uploadToStorage)
+      })
+      .tap(function() {
+        ui.processing(photos, "Uploading");
+      })
+      .then(uploadToStorage)
+      .tap(function() {
+        ui.processing(photos, "Recording photo data");
+      })
       .then(recordInFrontend)
+      .tap(function() {
+        ui.processing(photos, "Printing receipt");
+      })
       .then(printReceipt)
       .then(finished)
       .then(null, handleError);

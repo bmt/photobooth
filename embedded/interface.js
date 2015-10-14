@@ -102,8 +102,8 @@ Interface.prototype.pending = function(time, images) {
       _.flatten([time, images]));
 };
 
-Interface.prototype.processing = function(images) {
-  this.sendCommand(InterfaceMode.PROCESSING, images);
+Interface.prototype.processing = function(images, msg) {
+  this.sendCommand(InterfaceMode.PROCESSING, _.flatten([images, msg]));
 };
 
 Interface.prototype.finished = function(image, url) {
