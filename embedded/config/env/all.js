@@ -1,17 +1,19 @@
 'use strict';
 
+var os = require('os');
+
+var interfacePaths = {
+  linux: '../interface/bin/interface_debug',
+  darwin: '../interface/bin/pbInterfaceDebug.app/Contents/MacOS/pbInterfaceDebug'
+};
+
 module.exports = {
   countdown: 5,
   frontend: {
-    host: 'http://localhost:3000',
+    host: 'http://localhost:3000'
   },
   interface: {
-    // This is an OSX 64-bit universal binary.
-    // TODO: Figure out a platform-specific config option.
-    // path: './bin/pbInterface.app/Contents/MacOS/pbInterface'
-    // TODO: Bundle the fonts properly so the stand-alone binary works.
-    path: '../interface/bin/pbInterfaceDebug.app/Contents/MacOS/pbInterfaceDebug',
-    // path: '../interface/bin/interface',
+    path: interfacePaths[os.platform()],
     maxRestarts: 5
   },
 	google: {
