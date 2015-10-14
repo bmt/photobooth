@@ -26,6 +26,10 @@ Camera.prototype.takePhoto = function() {
   });
 };
 
+Camera.prototype.downloadPhotoImpl = function(photo) {
+  throw new Error('Subclasses must implement downloadPhotoImpl');
+};
+
 Camera.prototype.openPreviewImpl = function() {
   throw new Error('Subclasses must implement openPreviewImpl.');
 };

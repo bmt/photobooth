@@ -10,10 +10,11 @@ var InterfaceMode = {
   IDLE: '0',
   PREVIEW: '1',
   PENDING: '2',
-  PROCESSING: '3',
-  FINISHED: '4',
-  ERROR: '5',
-  UNKNOWN: '6',
+  CAPTURE: '3',
+  PROCESSING: '4',
+  FINISHED: '5',
+  ERROR: '6',
+  UNKNOWN: '7',
 };
 
 var Interface = function(socket) {
@@ -100,6 +101,11 @@ Interface.prototype.preview = function() {
 Interface.prototype.pending = function(time, images) {
   this.sendCommand(InterfaceMode.PENDING,
       _.flatten([time, images]));
+};
+
+Interface.prototype.capture = function(images) {
+  this.sendCommand(InterfaceMode.CAPTURE,
+      _.flatten(images));
 };
 
 Interface.prototype.processing = function(images, msg) {

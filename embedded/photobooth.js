@@ -140,12 +140,6 @@ var Photobooth = function(panel, camera, ui, server) {
   // State -> pending
   function pending() {
     transition('pending');
-    // If there are existing photos, send them immediately so they can get
-    // displayed while the camera is resetting.
-    if (photos.length) {
-      ui.pending(0, photos);
-    }
-
     var secondsRemaining = config.countdown;
     previewHandle = camera.openPreview();
     server.setSourceStream(previewHandle.stream);
@@ -170,14 +164,23 @@ var Photobooth = function(panel, camera, ui, server) {
   // State -> capture
   function capture() {
     transition('capture');
-    pendingPromise = camera.takePhoto().then(function(photo) {
-      photos.push(photo);
-      if (photos.length == 3) {
-        processing();
-      } else {
-        pending();
-      }
-    }, handleError);
+    pendingPromise = camera.reset()
+      .tap(function() {
+        ui.capture(photos);
+      })
+      .then(camera.takePhoto.bind(camera))
+      .then(function(photo) {
+        photos.push(photo);
+        if (photos.length == 3) {
+          // Make sure the new photo is shown.
+          ui.capture(photos);
+          processing();
+        } else {
+          // Make sure the new photo is shown.
+          ui.capture(photos);
+          pending();
+        }
+      }, handleError);
   }
 
   // State -> processing
