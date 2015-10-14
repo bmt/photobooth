@@ -12,6 +12,8 @@
     "node": ">=0.10.28",
     "npm": ">=1.4.28"
   },
+  "main": "server.js",
+  "web": "server.js",
   "scripts": {
     "start": "grunt",
     "test": "grunt test",
