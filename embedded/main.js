@@ -113,7 +113,7 @@ function verifyCloudStorage() {
       defer.resolve();
     }
   });
-  return promise.resolve();
+  return defer.promise;
 }
 
 if (require.main === module) {
