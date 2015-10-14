@@ -109,10 +109,21 @@ void PendingView::draw() {
     ofPopStyle();
 }
 
+void ProcessingView::update(const string& msg) {
+    msg_ = msg;
+}
+
 void ProcessingView::draw() {
     ofPushStyle();
     ofSetColor(0);
-    defaultFont_.drawString("Processing...", GUTTER, TEXT_Y);
+    string output = "Processing, please wait";
+    if (msg_.size() > 0) {
+        output += ": ";
+        output += msg_;
+    } else {
+        output += ".";
+    }
+    defaultFont_.drawString(output, GUTTER, TEXT_Y);
     load_->setVisible(true);
     bar_->draw(PHOTOBAR_X, PHOTOBAR_Y);
     // TODO: show last snapshot in video slot.

@@ -37,6 +37,7 @@ private:
     LoadingAnimation loadingAnimation_;
     Image finalImage_;
     string shareUrl_;
+    string processingMsg_;
 
     // View objects
     PhotoBar photoBar_;

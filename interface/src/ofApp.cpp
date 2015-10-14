@@ -44,8 +44,10 @@ void ofApp::update(){
         case PREVIEW:
             previewVideo_.update();
             break;
-        case IDLE:
         case PROCESSING:
+            processing_.update(processingMsg_);
+            break;
+        case IDLE:
         case ERROR:
         case UNKNOWN:
         default:
@@ -110,7 +112,7 @@ void swapImageIfChanged(Image* current, Image* newImg) {
 
 void ofApp::commandReceived(Command& cmd) {
     vector<string> imgPaths(3, "");
-    string timeRemaining, finalPath, finalUrl;
+    string timeRemaining, finalPath, finalUrl, processingMsg;
     switch(cmd.mode) {
         case PENDING:
             if (cmd.args.size() > 0) {
@@ -121,8 +123,14 @@ void ofApp::commandReceived(Command& cmd) {
                       cmd.args.end(), imgPaths.begin());
             break;
         case PROCESSING:
-            std::copy(cmd.args.begin(), cmd.args.end(),
-                      imgPaths.begin());
+            if (cmd.args.size() > 2) {
+                std::copy(cmd.args.begin(), cmd.args.begin() + 3,
+                          imgPaths.begin());
+            }
+            if (cmd.args.size() > 3) {
+                processingMsg = cmd.args[3];
+            }
+            break;
         case FINISHED:
             if (cmd.args.size() > 0) {
                 finalPath = cmd.args[0];
@@ -130,6 +138,7 @@ void ofApp::commandReceived(Command& cmd) {
             if (cmd.args.size() > 1) {
                 finalUrl = cmd.args[1];
             }
+            break;
         case IDLE:
         case PREVIEW:
         case ERROR:
@@ -163,6 +172,7 @@ void ofApp::commandReceived(Command& cmd) {
     mode_ = cmd.mode;
     timeRemaining_ = timeRemaining;
     shareUrl_ = finalUrl;
+    processingMsg_ = processingMsg;
 
     // TODO: release mutex
 }

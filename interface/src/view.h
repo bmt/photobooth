@@ -155,9 +155,11 @@ public:
         bar_(bar),
         load_(load){}
     virtual void draw();
+    virtual void update(const string& msg);
 private:
     PhotoBar* bar_;
     LoadingAnimation* load_;
+    string msg_;
 };
 
 class FinishedView : public View {
