@@ -9,6 +9,11 @@ openFrameworksUniversal.a
 libs/openFrameworksCompiled/lib/*/*
 !libs/openFrameworksCompiled/lib/*/.gitkeep
 
+# Binaries
+bin/interface
+bin/interface_debug
+bin/readMe.txt
+
 # apothecary
 scripts/apothecary/build
 
