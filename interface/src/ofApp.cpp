@@ -35,8 +35,9 @@ void ofApp::update(){
     loadingAnimation_.update();
     switch (mode_) {
         case PENDING:
+        case CAPTURE:
             previewVideo_.update();
-            pending_.update(timeRemaining_);
+            pending_.update(timeRemaining_, mode_ == CAPTURE);
             break;
         case FINISHED:
             finished_.update(finalImage_, shareUrl_);
@@ -66,6 +67,7 @@ void ofApp::draw(){
             preview_.draw();
             break;
         case PENDING:
+        case CAPTURE:
             pending_.draw();
             break;
         case PROCESSING:
@@ -120,6 +122,10 @@ void ofApp::commandReceived(Command& cmd) {
             }
 
             std::copy(cmd.args.begin() + 1,
+                      cmd.args.end(), imgPaths.begin());
+            break;
+        case CAPTURE:
+            std::copy(cmd.args.begin(),
                       cmd.args.end(), imgPaths.begin());
             break;
         case PROCESSING:

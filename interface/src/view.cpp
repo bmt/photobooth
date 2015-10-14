@@ -89,8 +89,9 @@ void PreviewView::draw() {
     ofPopStyle();
 }
 
-void PendingView::update(const string& timeRemaining) {
+void PendingView::update(const string& timeRemaining, bool capturing) {
     timeRemaining_ = timeRemaining;
+    capturing_ = capturing;
 }
 
 void PendingView::draw() {
@@ -99,9 +100,13 @@ void PendingView::draw() {
     bar_->draw(PHOTOBAR_X, PHOTOBAR_Y);
     preview_->draw(PREVIEW_X, PREVIEW_Y);
     string output;
-    if (timeRemaining_ == "0") {
+    if (capturing_) {
         load_->setVisible(true);
         defaultFont_.drawString("Say Cheese!", GUTTER, TEXT_Y);
+    } else if (timeRemaining_ == "0") {
+        load_->setVisible(true);
+        defaultFont_.drawString("Wait for the SECOND click.",
+                                GUTTER, TEXT_Y);
     } else {
         ofSetColor(255, 255, 255, 150);
         font_.drawString(timeRemaining_, COUNTDOWN_X, COUNTDOWN_Y);

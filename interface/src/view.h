@@ -15,7 +15,7 @@
 #include <string>
 
 
-enum ViewMode { IDLE, PREVIEW, PENDING, PROCESSING, FINISHED, ERROR, UNKNOWN};
+enum ViewMode { IDLE, PREVIEW, PENDING, CAPTURE, PROCESSING, FINISHED, ERROR, UNKNOWN};
 
 class LoadingAnimation {
   public:
@@ -139,8 +139,9 @@ public:
             font_.loadFont("verdana.ttf", 80, true, true);
         };
     virtual void draw();
-    virtual void update(const string& timeRemaining);
+    virtual void update(const string& timeRemaining, bool capturing);
 private:
+    bool capturing_;
     ofTrueTypeFont font_;
     string timeRemaining_;
     PhotoBar* bar_;
