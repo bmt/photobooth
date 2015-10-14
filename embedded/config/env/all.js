@@ -7,10 +7,18 @@ var interfacePaths = {
   darwin: '../interface/bin/pbInterfaceDebug.app/Contents/MacOS/pbInterfaceDebug'
 };
 
+var gphotoPaths = {
+  linux: '/usr/bin/gphoto2',
+  darwin: '/opt/local/bin/gphoto2',
+};
+
 module.exports = {
   countdown: 5,
   frontend: {
-    host: 'http://localhost:3000'
+    host: 'http://piphoto.herokuapp.com'
+  },
+  gphoto: {
+    path: gphotoPaths[os.platform()],
   },
   interface: {
     path: interfacePaths[os.platform()],

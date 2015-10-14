@@ -2,6 +2,7 @@
 
 var promise = require('bluebird'),
     _ = require('lodash'),
+    config = require('../config/config'),
     tmp = require('tmp'),
     util = require('util'),
     debug = require('debug')('camera'),
@@ -12,22 +13,22 @@ var promise = require('bluebird'),
     Camera = require('./camera'),
     PreviewHandle = require('./previewHandle');
 
-var gphoto = '/opt/local/bin/gphoto2';
-
 var Canon = function() {};
 util.inherits(Canon, Camera);
 
 // Static
 Canon.isPresent = function() {
-  var output = spawnSync(gphoto, ['--summary']);
-  var stderr = output.stderr.toString('utf8');
+  var output = spawnSync(config.gphoto.path, ['--summary']);
   if (output.error) {
     console.trace(output.error);
     return false;
   } else if (output.status == 0) {
     // TODO: Check for camera capabilities.
     return true;
-  } else if (_.contains(stderr, 'Error: No camera found.')) {
+  }
+
+  var stderr = output.stderr.toString('utf8');
+  if (_.contains(stderr, 'Error: No camera found.')) {
     return false;
   } else {
     debug(stderr);
@@ -42,7 +43,7 @@ Canon.prototype.takePhotoImpl = function() {
     debug('Taking photo: ' + dest);
     // TODO: Handle failures properly...this doesn't reset when half-press
     // fails like on Amanda's Camera with the borken flash.
-    exec(gphoto + ' --capture-image-and-download --filename=' + dest,
+    exec(config.gphoto.path + ' --capture-image-and-download --filename=' + dest,
         function(err, stdout, stderr) {
           debug(stdout);
           debug(stderr);
@@ -59,7 +60,7 @@ Canon.prototype.takePhotoImpl = function() {
 
 Canon.prototype.openPreviewImpl = function() {
   debug('Opening preview stream.');
-  var movie = spawn(gphoto, ['--capture-movie', '--stdout']);
+  var movie = spawn(config.gphoto.path, ['--capture-movie', '--stdout']);
   return new PreviewHandle(movie.stdout, movie);
 };
 
