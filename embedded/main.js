@@ -76,6 +76,7 @@ function verifyGm() {
 }
 
 function verifyInterface() {
+  debug('Verifying interface: ' + config.interface.path);
   var defer = promise.pending();
   fs.access(config.interface.path, fs.X_OK, function(err) {
     if (err) {
@@ -89,7 +90,7 @@ function verifyInterface() {
 }
 
 function verifyFrontend() {
-  debug('Verifying frontend configuration.');
+  debug('Verifying frontend configuration: ' + config.frontend.host);
   return request.get(config.frontend.host).then(function(data) {
     debug('Frontend OK')
     return data;
@@ -128,5 +129,9 @@ if (require.main === module) {
     var booth = new Photobooth(panel, camera, ui, server);
     booth.run();
     forever();
+  }, function(e) {
+    console.error(e);
+    console.error('Initialization failed.');
+    exit(1);
   });
 }
