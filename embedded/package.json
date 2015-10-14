@@ -1,5 +1,5 @@
 {
-  "name": "photoboots-embedded",
+  "name": "photobooth-embedded",
   "description": "Embedded photobooth module.",
   "version": "0.0.1",
   "author": "Brian Turnbull",
@@ -8,13 +8,15 @@
     "type": "git",
     "url": "git://github.com/bmt/photobooth.git"
   },
+  "main": "main.js",
   "engines": {
     "node": "0.12.x",
     "npm": "1.4.x"
   },
   "scripts": {
     "lint": "node_modules/jshint/bin/jshint .",
-    "validate": "npm ls"
+    "validate": "npm ls",
+    "start": "node main.js"
   },
   "pre-commit": [
     "lint"
