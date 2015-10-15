@@ -3,8 +3,8 @@
 var os = require('os');
 
 var interfacePaths = {
-  linux: '../interface/bin/interface_debug',
-  darwin: '../interface/bin/pbInterfaceDebug.app/Contents/MacOS/pbInterfaceDebug'
+  linux: '../interface/bin/interface',
+  darwin: '../interface/bin/pbInterfaceDebug.app/Contents/MacOS/pbInterface'
 };
 
 var gphotoPaths = {
