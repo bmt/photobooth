@@ -115,10 +115,17 @@ var Photobooth = function(panel, camera, ui, server) {
     currentState = newState;
   }
 
+  function cleanup() {
+    resetPhotos();
+    if (previewHandle) {
+      previewHandle.close();
+    }
+  }
+
   // State -> idle
   function idle() {
     transition('idle');
-    resetPhotos();
+    cleanup();
     ui.idle();
     panel.on('activate', preview);
   }
@@ -158,7 +165,7 @@ var Photobooth = function(panel, camera, ui, server) {
         }
       }
       pendingTimeout = setTimeout(tick, 1000);
-    });
+    }, error);
   }
 
   // State -> capture
@@ -211,6 +218,7 @@ var Photobooth = function(panel, camera, ui, server) {
   // State -> error
   function error() {
     transition('error');
+    cleanup();
     ui.error();
     pendingTimeout = setTimeout(idle, 1000*60*1);
   }

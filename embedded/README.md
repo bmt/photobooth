@@ -13,6 +13,7 @@ Update your enviroment:
 `sudo port -v selfupdate`
 
 #### Install gphoto2
+Requires >=2.5.8
 `sudo port install gphoto2`
 
 Every time you plug in the camera, you have to kill the system app that takes

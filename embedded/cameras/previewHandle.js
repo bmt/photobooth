@@ -15,6 +15,7 @@ module.exports = function(stream, process) {
   // Fulfill this promise once we get data on the stream.
   var readyDeferred = promise.pending();
   this.stream.on('data', readyDeferred.resolve.bind(readyDeferred));
+  this.stream.on('end', readyDeferred.reject.bind(readyDeferred));
   this.ready = readyDeferred.promise;
 
   // Kill the process and thus end the stream.

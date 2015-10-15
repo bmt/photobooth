@@ -61,6 +61,7 @@ Canon.prototype.takePhotoImpl = function() {
 Canon.prototype.openPreviewImpl = function() {
   debug('Opening preview stream.');
   var movie = spawn(config.gphoto.path, ['--capture-movie', '--stdout']);
+  movie.stderr.pipe(process.stdout);
   return new PreviewHandle(movie.stdout, movie);
 };
 
