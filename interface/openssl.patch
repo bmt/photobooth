@@ -1,0 +1,19 @@
+--- of_v0.8.4_osx_release/libs/openFrameworksCompiled/project/osx/CoreOF.xcconfig	2014-09-09 05:05:22.000000000 -0500
++++ of_v0.8.4_osx_release/libs/openFrameworksCompiled/project/osx/CoreOF.xcconfig	2015-10-15 18:35:20.000000000 -0500
+@@ -9,6 +9,7 @@
+ HEADER_CAIRO = "$(OF_PATH)/libs/cairo/include/cairo"
+ HEADER_RTAUDIO = "$(OF_PATH)/libs/rtAudio/include"
+ HEADER_GLFW = "$(OF_PATH)/libs/glfw/include"
++HEADER_OPENSSL = "$(OF_PATH)/libs/openssl/include"
+ 
+ LIB_FMODEX = "$(OF_PATH)/libs/fmodex/lib/osx/libfmodex.dylib"
+ LIB_GLUT = "$(OF_PATH)/libs/glut/lib/osx/GLUT.framework/Versions/A/GLUT"
+@@ -35,7 +36,7 @@
+ LIB_OPENSSL2 = "$(OF_PATH)/libs/openssl/lib/osx/ssl.a"
+ 
+ OF_CORE_LIBS = $(LIB_POCO_1) $(LIB_POCO_2) $(LIB_POCO_3) $(LIB_POCO_4) $(LIB_POCO_5) $(LIB_POCO_6) $(LIB_POCO_7) $(LIB_POCO_8) $(LIB_POCO_9) $(LIB_POCO_10) $(LIB_TESS) $(LIB_GLEW) $(LIB_CAIRO1) $(LIB_CAIRO2) $(LIB_CAIRO3) $(LIB_FMODEX) $(LIB_RTAUDIO) $(LIB_OPENSSL1) $(LIB_OPENSSL2) $(LIB_GLFW) $(LIB_FREEIMAGE) $(LIB_FREETYPE)
+-OF_CORE_HEADERS = $(HEADER_OF) $(HEADER_POCO) $(HEADER_FREETYPE) $(HEADER_FREETYPE2) $(HEADER_FMODEX) $(HEADER_GLEW) $(HEADER_FREEIMAGE) $(HEADER_TESS2) $(HEADER_CAIRO) $(HEADER_RTAUDIO) $(HEADER_GLFW)
++OF_CORE_HEADERS = $(HEADER_OF) $(HEADER_POCO) $(HEADER_FREETYPE) $(HEADER_FREETYPE2) $(HEADER_FMODEX) $(HEADER_GLEW) $(HEADER_FREEIMAGE) $(HEADER_TESS2) $(HEADER_CAIRO) $(HEADER_RTAUDIO) $(HEADER_GLFW) $(HEADER_OPENSSL)
+ 
+ // define which C++ library is required to build and avoid tr1/memory hangups
+ CLANG_CXX_LIBRARY = libstdc++

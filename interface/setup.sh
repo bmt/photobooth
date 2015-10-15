@@ -5,6 +5,7 @@ if [[ $(uname) == "Darwin" ]]; then
   echo "Downloading OpenFrameworks 0.8.4 for mac."
   curl -O http://www.openframeworks.cc/versions/v0.8.4/of_v0.8.4_osx_release.zip
   unzip of_v0.8.4_osx_release.zip
+  patch -p0 < interface/openssl.patch
 elif [[ $(uname -m) == "armv7l" ]]; then
   echo "Downloading OpenFrameworks 20151003 nightly for Pi2"
   cd ../
