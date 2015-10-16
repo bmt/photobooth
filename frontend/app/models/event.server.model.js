@@ -11,7 +11,10 @@ var EventSchema = new Schema({
 		type: Date,
 		default: Date.now
 	},
-  // TODO: Add event details.
+  name: {
+    type: String,
+    required: true,
+  },
 });
 
 mongoose.model('Event', EventSchema);
