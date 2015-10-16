@@ -11,6 +11,7 @@
 
 #include "ofMain.h"
 #include "videoGrabber.h"
+#include "ofxTextSuite.h"
 #include <vector>
 #include <string>
 
@@ -28,17 +29,6 @@ class LoadingAnimation {
     float y_;
     bool visible_;
     ofPolyline line_;
-};
-
-class Heading {
-public:
-    void clear();
-    Heading() {
-        font_.loadFont("verdana.ttf", 60, true, true);
-    };
-    void draw();
-private:
-    ofTrueTypeFont font_;
 };
 
 // Add copy/assign constructors.
@@ -83,16 +73,19 @@ public:
         }
     }
 
-    void draw(int x, int y) {
+    bool draw(int x, int y) {
         if (!path.empty()) {
             image->draw(x, y);
+            return true;
+        } else {
+            return false;
         }
     }
 };
 
 class PhotoBar {
 public:
-    PhotoBar() : images_(3) {}
+    PhotoBar() : images_(4) {}
     void update(const vector<Image>& images);
     void draw(int x, int y);
 private:
@@ -104,45 +97,49 @@ public:
     virtual void draw() = 0;
     virtual void update() {};
     virtual void clear() {};
-    View() {
-      defaultFont_.loadFont("verdana.ttf", 14, true, true);
+    View(ofxTextBlock* text) {
+        text_ = text;
     };
     ~View() {};
 protected:
-    ofTrueTypeFont defaultFont_;
+    ofxTextBlock* text_;
 };
 
 class IdleView : public View {
 public:
-    IdleView() : View() {};
-    virtual void draw();
+    IdleView(ofxTextBlock* text) : View(text) {};
+    virtual void draw() {};
+    virtual void update();
 };
 
 class PreviewView : public View {
 public:
-    PreviewView(VideoGrabber* preview)
-      : View(),
+    PreviewView(VideoGrabber* preview, ofxTextBlock* text)
+      : View(text),
         preview_(preview) {};
     virtual void draw();
+    virtual void update();
 private:
     VideoGrabber* preview_;
 };
 
 class PendingView : public View {
 public:
-    PendingView(PhotoBar* bar, VideoGrabber* preview, LoadingAnimation* load)
-      : View(),
+    PendingView(PhotoBar* bar, VideoGrabber* preview,
+                LoadingAnimation* load, ofxTextBlock* text)
+      : View(text),
         bar_(bar),
         preview_(preview),
         load_(load),
         timeRemaining_("") {
-            font_.loadFont("verdana.ttf", 80, true, true);
+            countdown_.init("verdana.ttf", 80);
+            countdown_.setColor(255, 255, 255, 150);
         };
     virtual void draw();
     virtual void update(const string& timeRemaining, bool capturing);
 private:
     bool capturing_;
-    ofTrueTypeFont font_;
+    ofxTextBlock countdown_;
     string timeRemaining_;
     PhotoBar* bar_;
     VideoGrabber* preview_;
@@ -151,8 +148,9 @@ private:
 
 class ProcessingView : public View {
 public:
-    ProcessingView(PhotoBar* bar, LoadingAnimation* load)
-      : View(),
+    ProcessingView(PhotoBar* bar, LoadingAnimation* load,
+                   ofxTextBlock* text)
+      : View(text),
         bar_(bar),
         load_(load){}
     virtual void draw();
@@ -160,12 +158,11 @@ public:
 private:
     PhotoBar* bar_;
     LoadingAnimation* load_;
-    string msg_;
 };
 
 class FinishedView : public View {
 public:
-    FinishedView() : View() {
+    FinishedView(ofxTextBlock* text) : View(text) {
         font_.loadFont("verdana.ttf", 36, true, true);
     };
     virtual void draw();
@@ -178,8 +175,9 @@ private:
 
 class ErrorView : public View {
 public:
-    ErrorView() : View() {};
+    ErrorView(ofxTextBlock* text) : View(text) {};
     virtual void draw();
+    virtual void update();
 };
 
 #endif /* view_h */

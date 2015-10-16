@@ -9,7 +9,7 @@ int main(int argc, char* argv[]){
         exit(1);
         return 0;
     } else {
-        ofSetupOpenGL(1024,768,OF_FULLSCREEN);
+        ofSetupOpenGL(1280,1024,OF_WINDOW);
         ofRunApp(new ofApp(argv[1]));
     }
 }

@@ -61,30 +61,32 @@ void PhotoBar::draw(int x, int y) {
     ofPushStyle();
     ofSetColor(255);
     for (int i=0; i < images_.size(); ++i) {
-        images_[i].draw(x, y + i * (PHOTOBAR_PHOTO_HEIGHT + PHOTOBAR_MARGIN));
+        float imageX = x + i * (PHOTOBAR_PHOTO_WIDTH + PHOTOBAR_MARGIN);
+        float imageY = y;
+        if (!images_[i].draw(imageX, imageY)) {
+            // Draw a placeholder
+            ofPushStyle();
+            ofFill();
+            ofSetColor(PLACEHOLDER_GRAY);
+            ofRect(imageX, imageY, PHOTOBAR_PHOTO_WIDTH,
+                   PHOTOBAR_PHOTO_HEIGHT);
+            ofPopStyle();
+        }
     }
     ofPopStyle();
 }
 
-void Heading::draw() {
-    ofPushStyle();
-    ofSetColor(0);
-    font_.drawString("Photobooth", GUTTER, HEADING_Y);
-    ofPopStyle();
+void IdleView::update() {
+    text_->setText("Press green button to begin.");
 }
 
-void IdleView::draw() {
-    ofPushStyle();
-    ofSetColor(0);
-    defaultFont_.drawString("Press button to begin.",
-                            GUTTER, TEXT_Y);
-    ofPopStyle();
+void PreviewView::update() {
+    text_->setText("Press button to start countdown.");
 }
 
 void PreviewView::draw() {
     ofPushStyle();
     ofSetColor(0);
-    defaultFont_.drawString("Press button to start countdown.", GUTTER, TEXT_Y);
     preview_->draw(PREVIEW_X, PREVIEW_Y);
     ofPopStyle();
 }
@@ -92,6 +94,16 @@ void PreviewView::draw() {
 void PendingView::update(const string& timeRemaining, bool capturing) {
     timeRemaining_ = timeRemaining;
     capturing_ = capturing;
+    if (capturing_) {
+        load_->setVisible(true);
+        text_->setText("Say Cheese!");
+    } else if (timeRemaining_ == "0") {
+        load_->setVisible(true);
+        text_->setText("Wait for the SECOND click.");
+    } else {
+        text_->setText("");
+        countdown_.setText(timeRemaining_);
+    }
 }
 
 void PendingView::draw() {
@@ -100,40 +112,25 @@ void PendingView::draw() {
     bar_->draw(PHOTOBAR_X, PHOTOBAR_Y);
     preview_->draw(PREVIEW_X, PREVIEW_Y);
     string output;
-    if (capturing_) {
-        load_->setVisible(true);
-        defaultFont_.drawString("Say Cheese!", GUTTER, TEXT_Y);
-    } else if (timeRemaining_ == "0") {
-        load_->setVisible(true);
-        defaultFont_.drawString("Wait for the SECOND click.",
-                                GUTTER, TEXT_Y);
-    } else {
-        ofSetColor(255, 255, 255, 150);
-        font_.drawString(timeRemaining_, COUNTDOWN_X, COUNTDOWN_Y);
+    if (!capturing_ && timeRemaining_ != "0") {
+        countdown_.drawCenter(PREVIEW_CENTER_X, PREVIEW_CENTER_Y);
     }
     ofPopStyle();
 }
 
 void ProcessingView::update(const string& msg) {
-    msg_ = msg;
-}
-
-void ProcessingView::draw() {
-    ofPushStyle();
-    ofSetColor(0);
     string output = "Processing, please wait";
-    if (msg_.size() > 0) {
+    if (msg.size() > 0) {
         output += ": ";
-        output += msg_;
+        output += msg;
     } else {
         output += ".";
     }
-    defaultFont_.drawString(output, GUTTER, TEXT_Y);
+    text_->setText(output);
     load_->setVisible(true);
-    bar_->draw(PHOTOBAR_X, PHOTOBAR_Y);
-    // TODO: show last snapshot in video slot.
-    // preview_->draw(PREVIEW_X, PREVIEW_Y);
-    ofPopStyle();
+}
+
+void ProcessingView::draw() {
 }
 
 void FinishedView::update(const Image& image, const string& shareUrl) {
@@ -142,20 +139,22 @@ void FinishedView::update(const Image& image, const string& shareUrl) {
         image_.update();
     }
     shareUrl_ = shareUrl;
+    text_->setText("Take card with url to view all photos from the party. Press green button to start over.");
 }
 
 void FinishedView::draw() {
-    image_.draw(FINAL_PHOTO_X, FINAL_PHOTO_Y);
     ofPushStyle();
-    ofSetColor(0);
-    font_.drawString(shareUrl_, SHARE_URL_X, SHARE_URL_Y);
-    defaultFont_.drawString("Take receipt with share url and scannable QRcode.  Press button to start again.",
-                            SHARE_TEXT_X, SHARE_TEXT_Y);
+    ofSetColor(255);
+    image_.draw(PREVIEW_X, PREVIEW_Y);
+    // Disabled for block party.
+    // ofSetColor(0);
+    // font_.drawString(shareUrl_, SHARE_URL_X, SHARE_URL_Y);
     ofPopStyle();
 }
 
+void ErrorView::update() {
+    text_->setText("Error");
+}
+
 void ErrorView::draw() {
-    ofSetColor(0);
-    defaultFont_.drawString("Error", GUTTER, TEXT_Y);
-    ofPopStyle();
 }

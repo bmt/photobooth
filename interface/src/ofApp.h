@@ -4,6 +4,7 @@
 #include "inputThread.h"
 #include "videoGrabber.h"
 #include "view.h"
+#include "ofxTextSuite.h"
 #include <string>
 #include <vector>
 
@@ -40,8 +41,12 @@ private:
     string processingMsg_;
 
     // View objects
+    ofxTextBlock heading_;
+    ofxTextBlock text_;
+    ofxTextBlock footerLeft_;
+    ofxTextBlock footerRight_;
+
     PhotoBar photoBar_;
-    Heading heading_;
     IdleView idle_;
     PreviewView preview_;
     PendingView pending_;

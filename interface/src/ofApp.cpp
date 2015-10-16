@@ -7,20 +7,40 @@
 ofApp::ofApp(const char* socket)
 : ofBaseApp(),
 socket_(socket),
-images_(3, Image()),
+images_(4, Image()),
 previewVideo_(socket_),
 loadingAnimation_(
     PREVIEW_PHOTO_WIDTH/2 + PREVIEW_X - LOADING_W/2,
     PREVIEW_PHOTO_HEIGHT/2 + PREVIEW_Y - LOADING_H/2),
-preview_(&previewVideo_),
-pending_(&photoBar_, &previewVideo_, &loadingAnimation_),
-processing_(&photoBar_, &loadingAnimation_) {};
+idle_(&text_),
+error_(&text_),
+preview_(&previewVideo_, &text_),
+pending_(&photoBar_, &previewVideo_, &loadingAnimation_, &text_),
+finished_(&text_),
+processing_(&photoBar_, &loadingAnimation_, &text_) {};
 
 //--------------------------------------------------------------
 void ofApp::setup(){
     ofBackground(255);
     ofSetColor(255);
     ofTrueTypeFont::setGlobalDpi(72);
+    heading_.init("verdana.ttf", HEADING_FONT_SIZE);
+    heading_.setText("Block Party Photobooth");
+    heading_.setColor(0, 0, 0, 255);
+    heading_.setLineHeight(HEADING_LINE_HEIGHT);
+
+    text_.init("verdana.ttf", TEXT_FONT_SIZE);
+    text_.setText("Press a button to begin.");
+    text_.setColor(0, 0, 0, 255);
+
+    footerLeft_.init("verdana.ttf", TEXT_FONT_SIZE);
+    footerLeft_.setText("NOTE: All photos will be viewable by anyone with the  event url.");
+    footerLeft_.setColor(0, 0, 0, 255);
+
+    footerRight_.init("verdana.ttf", TEXT_FONT_SIZE);
+    footerRight_.setText("Owner: Brian Turnbull");
+    footerRight_.setColor(0, 0, 0, 255);
+
     ofSetVerticalSync(true);
     inputThread_.startThread();
     previewVideo_.connect();
@@ -58,7 +78,24 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    heading_.draw();
+    ofPushStyle();
+    ofSetColor(0);
+
+    // Heading
+    heading_.drawCenter(ofGetWidth()/2, HEADING_Y);
+
+    // Preview Placeholder
+    ofPushStyle();
+    ofSetColor(PLACEHOLDER_GRAY);
+    ofFill();
+    ofRect(PREVIEW_X, PREVIEW_Y, PREVIEW_PHOTO_WIDTH,
+           PREVIEW_PHOTO_HEIGHT);
+    ofPopStyle();
+
+    // Photobar
+    photoBar_.draw(PHOTOBAR_X, PHOTOBAR_Y);
+
+    // View-specific content
     switch (mode_) {
         case IDLE:
             idle_.draw();
@@ -81,7 +118,15 @@ void ofApp::draw(){
             error_.draw();
             break;
     }
+
+    // Animation
     loadingAnimation_.draw();
+
+    // General text
+    text_.drawLeft(TEXT_X, TEXT_Y);
+    footerLeft_.drawLeft(GUTTER, FOOTER_TEXT_Y);
+    footerRight_.drawRight(ofGetWidth() - GUTTER, FOOTER_TEXT_Y);
+    ofPopStyle();
 }
 
 void updateImageIfChanged(const string& newPath,
@@ -113,7 +158,7 @@ void swapImageIfChanged(Image* current, Image* newImg) {
 }
 
 void ofApp::commandReceived(Command& cmd) {
-    vector<string> imgPaths(3, "");
+    vector<string> imgPaths(4, "");
     string timeRemaining, finalPath, finalUrl, processingMsg;
     switch(cmd.mode) {
         case PENDING:
@@ -129,12 +174,12 @@ void ofApp::commandReceived(Command& cmd) {
                       cmd.args.end(), imgPaths.begin());
             break;
         case PROCESSING:
-            if (cmd.args.size() > 2) {
-                std::copy(cmd.args.begin(), cmd.args.begin() + 3,
+            if (cmd.args.size() > 3) {
+                std::copy(cmd.args.begin(), cmd.args.begin() + 4,
                           imgPaths.begin());
             }
-            if (cmd.args.size() > 3) {
-                processingMsg = cmd.args[3];
+            if (cmd.args.size() > 4) {
+                processingMsg = cmd.args[4];
             }
             break;
         case FINISHED:
@@ -154,24 +199,26 @@ void ofApp::commandReceived(Command& cmd) {
 
     Image newFinalImage;
     newFinalImage.image->setUseTexture(false);
-    vector<Image> newImages(3);
+    vector<Image> newImages(4);
     for (Image i : newImages) {
         i.image->setUseTexture(false);
     }
 
     // Load any new images.
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 4; ++i) {
         updateImageIfChanged(imgPaths[i], images_[i],
-                                PHOTOBAR_PHOTO_WIDTH,
-                                PHOTOBAR_PHOTO_HEIGHT,
-                                &(newImages[i]));
+                             PHOTOBAR_PHOTO_WIDTH,
+                             PHOTOBAR_PHOTO_HEIGHT,
+                             &(newImages[i]));
     }
+    // TODO: This is slightly skewing the image.
     updateImageIfChanged(finalPath, finalImage_,
-                         FINAL_PHOTO_WIDTH, 0, &newFinalImage);
+                         PREVIEW_PHOTO_WIDTH, PREVIEW_PHOTO_HEIGHT,
+                         &newFinalImage);
     // TODO: grab a mutex
 
     // Apply any changes to images.
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 4; ++i) {
         swapImageIfChanged(&images_[i], &newImages[i]);
     }
     swapImageIfChanged(&finalImage_, &newFinalImage);

@@ -7,6 +7,7 @@
 //
 
 #include "videoGrabber.h"
+#include "positions.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -99,7 +100,7 @@ void VideoGrabber::update() {
 void VideoGrabber::draw(int x, int y) {
     ofPushStyle();
     ofSetColor(255);
-    texture_.draw(x, y, 840, 560);
+    texture_.draw(x, y, PREVIEW_PHOTO_WIDTH, PREVIEW_PHOTO_HEIGHT);
     ofPopStyle();
     // TODO: overlay fps on video (optionally).
     // cout << "fps: " << currentFrameRate_ << endl;
