@@ -42,6 +42,8 @@ function onExit(opt_code) {
     camera.reset().then(function() {
       process.exit(opt_code);
     });
+  } else {
+    process.exit(opt_code);
   }
 }
 process.on('SIGINT', onExit);

@@ -12,15 +12,21 @@ case "$1" in
 	cd /opt/photobooth/embedded
 	. secrets/env/prod.sh
 	cd -
-	NODE_ENV=production DEBUG=* exec forever start -p $WORKING_DIR/pid --killSignal=SIGINT --sourceDir=$WORKING_DIR --workingDir=$WORKING_DIR -a -l $WORKING_DIR/logs/forever.main.log -o $WORKING_DIR/logs/main.out.log -e $WORKING_DIR/logs/main.err.log main.js
+	NODE_ENV=production DEBUG=* exec forever start -u pb-prod --sourceDir=$WORKING_DIR --workingDir=$WORKING_DIR -a -l $WORKING_DIR/logs/forever.main.log -o $WORKING_DIR/logs/main.out.log -e $WORKING_DIR/logs/main.err.log main.js
 	;;
 	
 	stop)
-	NODE_ENV=production DEBUG=* exec forever stop -p $WORKING_DIR/pid --killSignal=SIGNINT --sourceDir=$WORKING_DIR --workingDir=$WORKING_DIR -a -l $WORKING_DIR/logs/forever.main.log -o $WORKING_DIR/logs/main.out.log -e $WORKING_DIR/logs/main.err.log main.js
+	forever stop --killSignal=SIGNINT pb-prod
+	;;
+	
+	kill)
+	forever stop --killSignal=SIGKILL pb-prod
+	killall interface
+	killall interface_debug
 	;;
 	
 	*)
-	echo "Usage: /etc/init.d/photobooth {start|stop}"
+	echo "Usage: /etc/init.d/photobooth {start|stop|kill}"
 	exit 1
 	;;
 esac
