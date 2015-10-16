@@ -3,7 +3,8 @@
 var os = require('os');
 
 var interfacePaths = {
-  linux: '../interface/bin/interface',
+  linux: 'bin/interface',
+  // TODO: Figure out a deploy story for osx.
   darwin: '../interface/bin/pbInterfaceDebug.app/Contents/MacOS/pbInterface'
 };
 
