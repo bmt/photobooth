@@ -15,6 +15,16 @@ else
   git clone https://github.com/bmt/photobooth-secrets.git secrets
 fi
 
+if [[ -e adafruit ]]; then
+  echo '## Updating adafruit thermal library.'
+  cd adafruit
+  git pull
+  cd -
+else
+  echo '## Checking out adafruit thermal library.'
+  git clone https://github.com/adafruit/Python-Thermal-Printer adafruit
+fi
+
 echo '## Installing packages'
 npm install
 
