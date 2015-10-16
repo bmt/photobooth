@@ -4,6 +4,7 @@
  * Module dependencies.
  */
 var events = require('../../app/controllers/events.server.controller');
+var config = require('../../config/config');
 
 module.exports = function(app) {
 	app.route('/events')
