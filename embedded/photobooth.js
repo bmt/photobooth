@@ -197,7 +197,7 @@ var Photobooth = function(panel, camera, ui, server) {
   function processing() {
     transition('processing');
     ui.processing(photos, "Composing images");
-    joinImages(photos)
+    pendingPromise = joinImages(photos)
       .then(function(path) {
         finishedPhoto = path;
         return promise.resolve(path);
