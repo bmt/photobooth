@@ -31,13 +31,6 @@ var Panel = function() {
   }
 
   this.cleanup = function() {
-    if (activate) {
-      activate.unexport();
-    }
-
-    if (reset) {
-      reset.unexport();
-    }
   };
 };
 util.inherits(Panel, events.EventEmitter);
