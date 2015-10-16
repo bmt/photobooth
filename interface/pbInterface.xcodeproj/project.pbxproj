@@ -11,6 +11,7 @@
 		CC1C21ED1BB22EBD0059AC68 /* inputThread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC1C21EB1BB22EBD0059AC68 /* inputThread.cpp */; settings = {ASSET_TAGS = (); }; };
 		CC5478561BB783CD003C0595 /* videoGrabber.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC5478541BB783CD003C0595 /* videoGrabber.cpp */; settings = {ASSET_TAGS = (); }; };
 		CC824C991BB325850038CBA1 /* view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC824C971BB325850038CBA1 /* view.cpp */; settings = {ASSET_TAGS = (); }; };
+		CC944CA51BD0A00100CA258E /* ofxTextBlock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC944CA21BD0A00100CA258E /* ofxTextBlock.cpp */; settings = {ASSET_TAGS = (); }; };
 		E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
 		E45BE97B0E8CC7DD009D7055 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE9710E8CC7DD009D7055 /* AGL.framework */; };
 		E45BE97C0E8CC7DD009D7055 /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE9720E8CC7DD009D7055 /* ApplicationServices.framework */; };
@@ -69,6 +70,9 @@
 		CC5478551BB783CD003C0595 /* videoGrabber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = videoGrabber.h; sourceTree = "<group>"; };
 		CC824C971BB325850038CBA1 /* view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = view.cpp; sourceTree = "<group>"; };
 		CC824C981BB325850038CBA1 /* view.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = view.h; sourceTree = "<group>"; };
+		CC944CA21BD0A00100CA258E /* ofxTextBlock.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxTextBlock.cpp; sourceTree = "<group>"; };
+		CC944CA31BD0A00100CA258E /* ofxTextBlock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxTextBlock.h; sourceTree = "<group>"; };
+		CC944CA41BD0A00100CA258E /* ofxTextSuite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxTextSuite.h; sourceTree = "<group>"; };
 		CCB3C1321BB5ED1100131E49 /* positions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = positions.h; sourceTree = "<group>"; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../of_v0.8.4_osx_release/libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
 		E45BE9710E8CC7DD009D7055 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
@@ -190,6 +194,9 @@
 		E4B69E1C0A3A1BDC003C02F2 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				CC944CA21BD0A00100CA258E /* ofxTextBlock.cpp */,
+				CC944CA31BD0A00100CA258E /* ofxTextBlock.h */,
+				CC944CA41BD0A00100CA258E /* ofxTextSuite.h */,
 				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
 				E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */,
 				E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */,
@@ -304,6 +311,7 @@
 				CC824C991BB325850038CBA1 /* view.cpp in Sources */,
 				E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */,
 				CC1C21ED1BB22EBD0059AC68 /* inputThread.cpp in Sources */,
+				CC944CA51BD0A00100CA258E /* ofxTextBlock.cpp in Sources */,
 				E4B69E210A3A1BDC003C02F2 /* ofApp.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
