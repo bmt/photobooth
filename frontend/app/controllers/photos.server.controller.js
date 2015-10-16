@@ -85,7 +85,7 @@ exports.canDelete = function(req, res, next) {
 };
 
 exports.photoById = function(req, res, next, id) {
-	Photo.findById(id).exec(function(err, photo) {
+	Photo.findById(id).populate('event', 'name').exec(function(err, photo) {
 		if (err) return next(err);
 		if (!photo) {
 			return res.status(404).send({
