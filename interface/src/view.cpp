@@ -151,7 +151,16 @@ void FinishedView::update(const Image& image, const string& shareUrl) {
 void FinishedView::draw() {
     ofPushStyle();
     ofSetColor(255);
-    image_.draw(PREVIEW_X, PREVIEW_Y);
+    if (!image_.path.empty()) {
+      // Texture size limits require the image be split for rendering.
+      // TODO: Refactor this so we aren't doing it on the main thread.
+      ofImage left;
+      ofImage right;
+      left.cropFrom(*image_.image, 0, 0, PREVIEW_PHOTO_WIDTH/2, PREVIEW_PHOTO_HEIGHT);
+      right.cropFrom(*image_.image, PREVIEW_PHOTO_WIDTH/2, 0, PREVIEW_PHOTO_WIDTH/2, PREVIEW_PHOTO_HEIGHT);
+      left.draw(PREVIEW_X, PREVIEW_Y);
+      right.draw(PREVIEW_X + PREVIEW_PHOTO_WIDTH/2, PREVIEW_Y);
+    }
     // Disabled for block party.
     // ofSetColor(0);
     // font_.drawString(shareUrl_, SHARE_URL_X, SHARE_URL_Y);
