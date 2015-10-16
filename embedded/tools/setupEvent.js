@@ -14,7 +14,7 @@ request.post(config.frontend.host + '/events')
     console.info('  eventId: \'' + ev._id + '\',');
     if (config.env === 'production') {
       console.info('Update frontend with heroku:');
-      console.info('  heroku --app piphoto config:set BLOCK_PARTY_EVENT="' + ev._id + '"');
+      console.info('  heroku config:set --app piphoto BLOCK_PARTY_EVENT="' + ev._id + '"');
     } else {
       console.info('Update env and restart frontend:');
       console.info('  export BLOCK_PARTY_EVENT="' + ev._id + '"');
