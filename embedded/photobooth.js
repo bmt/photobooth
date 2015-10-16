@@ -202,19 +202,10 @@ var Photobooth = function(panel, camera, ui, server) {
         finishedPhoto = path;
         return promise.resolve(path);
       })
-      .tap(function() {
-        ui.processing(photos, "Uploading");
-      })
+      .tap(finished)
       .then(uploadToStorage)
-      .tap(function() {
-        ui.processing(photos, "Recording photo data");
-      })
       .then(recordInFrontend)
-      .tap(function() {
-        ui.processing(photos, "Printing receipt");
-      })
       .then(printReceipt)
-      .then(finished)
       .then(null, handleError);
   }
 
