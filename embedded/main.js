@@ -92,7 +92,7 @@ function verifyInterface() {
 function verifyFrontend() {
   debug('Verifying frontend configuration: ' + config.frontend.host);
   return request.get(config.frontend.host).then(function(data) {
-    debug('Frontend OK')
+    debug('Frontend OK');
     return data;
   }, function(err) {
     console.trace(err);
@@ -104,9 +104,9 @@ function verifyCloudStorage() {
   debug('Verifying google cloud storage connection.');
   var defer = promise.pending();
   var gcs = gcloud.storage();
-  var bucket = gcs.getBuckets(function(err, buckets) {
+  gcs.getBuckets(function(err, buckets) {
     if (err) {
-      console.trace(err)
+      console.trace(err);
       defer.reject(new Error('Cloud storage not available'));
     } else {
       debug('Cloud storage OK');

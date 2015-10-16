@@ -41,8 +41,8 @@ function uploadToStorage(path) {
   var gcs = gcloud.storage();
   var bucket = gcs.bucket(config.google.storageBucket);
 
-  var filename = ('photobooth-' +
-      moment().format('YYYYMMDD-hhmmss-SSS' + '.jpg'));
+  var filename = 'photobooth-' +
+      moment().format('YYYYMMDD-hhmmss-SSS' + '.jpg');
   var options = {
     destination: filename
   };

@@ -1,6 +1,7 @@
 'use strict';
 
-var promise = require('bluebird');
+var promise = require('bluebird'),
+    debug = require('debug')('preview');
 
 /**
  * A handle to a particular preview stream (and potentially process)
@@ -15,7 +16,6 @@ module.exports = function(stream, process) {
   // Fulfill this promise once we get data on the stream.
   var readyDeferred = promise.pending();
   this.stream.on('data', readyDeferred.resolve.bind(readyDeferred));
-  this.stream.on('end', readyDeferred.reject.bind(readyDeferred));
   this.ready = readyDeferred.promise;
 
   // Kill the process and thus end the stream.
@@ -23,8 +23,9 @@ module.exports = function(stream, process) {
     if (this.process && this.open) {
       this.open = false;
       var deferred = promise.pending();
+      debug('Killing gphoto process.');
       this.process.on('exit', deferred.resolve.bind(deferred));
-      this.process.kill();
+      this.process.kill('SIGINT');
       return deferred.promise;
     } else {
       return promise.resolve();

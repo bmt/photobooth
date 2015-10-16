@@ -1,7 +1,6 @@
-var promise = require('bluebird'),
-    fs = require('fs'),
-    tmp = require('tmp'),
-    PreviewHandle = require('./previewHandle');
+'use strict';
+
+var promise = require('bluebird');
 
 var Camera = function() {
   this.preview = null;

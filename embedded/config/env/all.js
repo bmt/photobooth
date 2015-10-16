@@ -8,7 +8,7 @@ var interfacePaths = {
 };
 
 var gphotoPaths = {
-  linux: '/usr/bin/gphoto2',
+  linux: '/usr/local/bin/gphoto2',
   darwin: '/opt/local/bin/gphoto2',
 };
 

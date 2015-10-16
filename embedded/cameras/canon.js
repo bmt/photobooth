@@ -22,7 +22,7 @@ Canon.isPresent = function() {
   if (output.error) {
     console.trace(output.error);
     return false;
-  } else if (output.status == 0) {
+  } else if (output.status === 0) {
     // TODO: Check for camera capabilities.
     return true;
   }
