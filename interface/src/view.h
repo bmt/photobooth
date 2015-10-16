@@ -12,6 +12,7 @@
 #include "ofMain.h"
 #include "videoGrabber.h"
 #include "ofxTextSuite.h"
+#include "positions.h"
 #include <vector>
 #include <string>
 
@@ -132,8 +133,7 @@ public:
         preview_(preview),
         load_(load),
         timeRemaining_("") {
-            countdown_.init("verdana.ttf", 80);
-            countdown_.setColor(255, 255, 255, 150);
+            countdown_.init("verdana.ttf", COUNTDOWN_FONT_SIZE);
         };
     virtual void draw();
     virtual void update(const string& timeRemaining, bool capturing);

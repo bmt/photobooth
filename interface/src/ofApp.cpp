@@ -9,9 +9,7 @@ ofApp::ofApp(const char* socket)
 socket_(socket),
 images_(4, Image()),
 previewVideo_(socket_),
-loadingAnimation_(
-    PREVIEW_PHOTO_WIDTH/2 + PREVIEW_X - LOADING_W/2,
-    PREVIEW_PHOTO_HEIGHT/2 + PREVIEW_Y - LOADING_H/2),
+loadingAnimation_(LOADING_X, LOADING_Y),
 idle_(&text_),
 error_(&text_),
 preview_(&previewVideo_, &text_),
