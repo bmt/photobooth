@@ -13,9 +13,9 @@ angular.module('photos').controller('PhotosController', ['$scope', '$stateParams
 
 		// Find existing photo
 		$scope.findOne = function() {
-			$scope.photo = Photos.get({
-				photoId: $stateParams.photoId
-			});
+      Photos.get({photoId: $stateParams.photoId}, function(photo) {
+        $scope.photo = photo;
+      });
 		};
 	}
 ]);
