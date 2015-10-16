@@ -12,11 +12,11 @@ case "$1" in
 	cd /opt/photobooth/embedded
 	. secrets/env/prod.sh
 	cd -
-	NODE_ENV=production DEBUG=* exec forever start --killSignal=SIGINT --sourceDir=$WORKING_DIR --workingDir=$WORKING_DIR -a -l $WORKING_DIR/logs/forever.main.log -o $WORKING_DIR/logs/main.out.log -e $WORKING_DIR/logs/main.err.log main.js
+	NODE_ENV=production DEBUG=* exec forever start -p $WORKING_DIR/pid --killSignal=SIGINT --sourceDir=$WORKING_DIR --workingDir=$WORKING_DIR -a -l $WORKING_DIR/logs/forever.main.log -o $WORKING_DIR/logs/main.out.log -e $WORKING_DIR/logs/main.err.log main.js
 	;;
 	
 	stop)
-	NODE_ENV=production DEBUG=* exec forever stop --killSignal=SIGNINT --sourceDir=$WORKING_DIR --workingDir=$WORKING_DIR -a -l $WORKING_DIR/logs/forever.main.log -o $WORKING_DIR/logs/main.out.log -e $WORKING_DIR/logs/main.err.log main.js
+	NODE_ENV=production DEBUG=* exec forever stop -p $WORKING_DIR/pid --killSignal=SIGNINT --sourceDir=$WORKING_DIR --workingDir=$WORKING_DIR -a -l $WORKING_DIR/logs/forever.main.log -o $WORKING_DIR/logs/main.out.log -e $WORKING_DIR/logs/main.err.log main.js
 	;;
 	
 	*)

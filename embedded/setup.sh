@@ -29,8 +29,10 @@ echo '## Installing packages'
 npm install
 
 if [[ $env != 'dev' ]]; then
-  echo '## Setting up logs directories.'
+  echo '## Setting up logs directory.'
   mkdir -p logs
+  echo '## Setting up pid directory.'
+  mkdir -p pid
 fi
 
 echo "## To start the app:"
