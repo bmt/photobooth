@@ -27,7 +27,7 @@ FakeCamera.prototype.takePhotoImpl = function() {
       setTimeout(deferred.resolve.bind(deferred, imgpath), 2000);
     });
   });
-  this.nextPhoto = ++this.nextPhoto % 3;
+  this.nextPhoto = ++this.nextPhoto % 4;
   return deferred.promise;
 };
 

@@ -23,11 +23,14 @@ function joinImages(photos) {
     // max width of 1024.  I had to use the manually constructed command because
     // otherwise .geometry() is added after input arguments and doesn't actually
     // set the maximum tile size.
-    gm(photos[2]).command('montage')
+    gm(photos[3]).command('montage')
       .in('-geometry')
       .in('+10+10')
+      .in('-tile')
+      .in('2x2')
       .in(photos[0])
       .in(photos[1])
+      .in(photos[2])
       .write(destPath, function() {
         deferred.resolve(destPath);
       });
@@ -178,7 +181,7 @@ var Photobooth = function(panel, camera, ui, server) {
       .then(camera.takePhoto.bind(camera))
       .then(function(photo) {
         photos.push(photo);
-        if (photos.length == 3) {
+        if (photos.length == 4) {
           // Make sure the new photo is shown.
           ui.capture(photos);
           processing();
