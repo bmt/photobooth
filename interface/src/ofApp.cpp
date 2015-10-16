@@ -48,6 +48,7 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    m_.lock();
     photoBar_.update(images_);
     loadingAnimation_.setVisible(false);
     loadingAnimation_.update();
@@ -72,10 +73,12 @@ void ofApp::update(){
         default:
             break;
     }
+    m_.unlock();
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+    m_.lock();
     ofPushStyle();
     ofSetColor(0);
 
@@ -125,6 +128,7 @@ void ofApp::draw(){
     footerLeft_.drawLeft(GUTTER, FOOTER_TEXT_Y);
     footerRight_.drawRight(ofGetWidth() - GUTTER, FOOTER_TEXT_Y);
     ofPopStyle();
+    m_.unlock();
 }
 
 void updateImageIfChanged(const string& newPath,
@@ -138,11 +142,11 @@ void updateImageIfChanged(const string& newPath,
         if (width > 0 && height > 0) {
           newImg->image->resize(width, height);
         } else if (width > 0) {
-          float ratio = width / newImg->image->getWidth(); 
+          float ratio = width / newImg->image->getWidth();
           float newHeight = ratio * newImg->image->getHeight();
           newImg->image->resize(width, newHeight);
         } else if (height > 0) {
-          float ratio = height / newImg->image->getHeight(); 
+          float ratio = height / newImg->image->getHeight();
           float newWidth = ratio * newImg->image->getWidth();
           newImg->image->resize(newWidth, height);
         }
@@ -213,8 +217,8 @@ void ofApp::commandReceived(Command& cmd) {
     updateImageIfChanged(finalPath, finalImage_,
                          PREVIEW_PHOTO_WIDTH, PREVIEW_PHOTO_HEIGHT,
                          &newFinalImage);
-    // TODO: grab a mutex
 
+    m_.lock();
     // Apply any changes to images.
     for (int i = 0; i < 4; ++i) {
         swapImageIfChanged(&images_[i], &newImages[i]);
@@ -224,8 +228,7 @@ void ofApp::commandReceived(Command& cmd) {
     timeRemaining_ = timeRemaining;
     shareUrl_ = finalUrl;
     processingMsg_ = processingMsg;
-
-    // TODO: release mutex
+    m_.unlock();
 }
 
 //--------------------------------------------------------------

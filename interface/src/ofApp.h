@@ -31,6 +31,7 @@ private:
     InputThread inputThread_;
 
     // App State
+    ofMutex m_;
     ViewMode mode_;
     string timeRemaining_;
     vector<Image> images_;
