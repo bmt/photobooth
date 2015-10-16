@@ -38,9 +38,11 @@ function onExit(opt_code) {
   server.close();
   panel.cleanup();
   ui.close();
-  camera.reset().then(function() {
-    process.exit(opt_code);
-  });
+  if (camera) {
+    camera.reset().then(function() {
+      process.exit(opt_code);
+    });
+  }
 }
 process.on('SIGINT', onExit);
 process.on('exit', onExit);
@@ -116,8 +118,21 @@ function verifyCloudStorage() {
   return defer.promise;
 }
 
+function verifyCamera() {
+  if (camera === null) {
+    return promise.reject(new Error('No camera found.'));
+  } else {
+    return promise.resolve();
+  }
+}
+
 if (require.main === module) {
+  if (camera === null) {
+    console.error('No camera found.');
+
+  }
   var checks = [
+    verifyCamera(),
     verifyInterface(),
     verifyGm(),
     verifyFrontend(),

@@ -1,5 +1,6 @@
 'use strict';
-var Canon = require('./canon'),
+var config = require('../config/config'),
+    Canon = require('./canon'),
     Logitech = require('./logitech'),
     FakeCamera = require('./fake_camera');
 
@@ -21,7 +22,11 @@ module.exports = function() {
     console.info('Logitech webcam not found.');
   }
 
-  // Fall back to fake camera.
-  console.info('No camera found, falling back to fake camera.');
-  return new FakeCamera();
+  // Fall back to fake camera for dev.
+  if (config.env === 'development') {
+    console.info('No camera found, falling back to fake camera.');
+    return new FakeCamera();
+  } else {
+    return null;
+  }
 };
