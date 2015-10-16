@@ -62,6 +62,9 @@ function uploadToStorage(path) {
 
 function recordInFrontend(storageInfo) {
   debug('Recording in frontend.');
+  if (config.eventId) {
+    storageInfo.event = config.eventId;
+  }
   return request.post(config.frontend.host + '/photos').form(storageInfo)
     .then(JSON.parse);
 }
