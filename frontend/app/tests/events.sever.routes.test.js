@@ -39,6 +39,20 @@ describe('Event CRUD tests', function() {
       });
 	});
 
+	it('should be able to get a single photo', function(done) {
+		// Create new event model instance
+		var eventObj = new Event(event);
+
+		// Save the photo
+		eventObj.save(function() {
+			request(app).get('/events/' + eventObj._id)
+				.end(function(req, res) {
+					res.body.should.be.an.Object.with.property('name', 'New Event');
+					done();
+				});
+		});
+	});
+
 	afterEach(function(done) {
     Event.remove().exec(done);
 	});
