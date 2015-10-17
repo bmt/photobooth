@@ -38,7 +38,7 @@ function joinImages(photos) {
   return deferred.promise;
 }
 
-function uploadToStorage(path) {
+function uploadOriginal(path) {
   debug('Uploading to cloud storage.');
   var deferred = promise.pending();
   var gcs = gcloud.storage();
@@ -53,19 +53,47 @@ function uploadToStorage(path) {
     if (err) {
       deferred.reject(err);
     } else {
-      deferred.resolve({bucket: file.metadata.bucket,
-                        name: file.metadata.name});
+      deferred.resolve({src: path,
+                        original: filename,
+                        thumb: undefined});
     }
   });
   return deferred.promise;
 }
 
-function recordInFrontend(storageInfo) {
+function uploadThumbnail(photo) {
+  debug('Creating and uploading thumbnail to cloud storage.');
+  var deferred = promise.pending();
+  var gcs = gcloud.storage();
+  var bucket = gcs.bucket(config.google.storageBucket);
+
+  var destName = photo.original.split('.')[0] + '-thumb.jpg';
+  var writeStream = bucket.file(destName).createWriteStream();
+
+  writeStream.on('finish', function() {
+    deferred.resolve({bucket: config.google.storageBucket,
+                      name: photo.original,
+                      thumb: {
+                        bucket: config.google.storageBucket,
+                        name: destName}});
+  });
+
+  gm(photo.src)
+    .resize(300, 200)
+    .stream(function(err, stdout, stderr) {
+      if (err) deferred.reject(err);
+      stdout.pipe(writeStream);
+    });
+
+  return deferred.promise;
+}
+
+function recordInFrontend(photo) {
   debug('Recording in frontend.');
   if (config.eventId) {
-    storageInfo.event = config.eventId;
+    photo.event = config.eventId;
   }
-  return request.post(config.frontend.host + '/photos').form(storageInfo)
+  return request.post(config.frontend.host + '/photos').form(photo)
     .then(JSON.parse);
 }
 
@@ -206,7 +234,8 @@ var Photobooth = function(panel, camera, ui, server) {
         return promise.resolve(path);
       })
       .tap(finished)
-      .then(uploadToStorage)
+      .then(uploadOriginal)
+      .then(uploadThumbnail)
       .then(recordInFrontend)
       .then(printReceipt)
       .then(null, handleError);
