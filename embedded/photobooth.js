@@ -132,7 +132,7 @@ var Photobooth = function(panel, camera, ui, server) {
   function idle() {
     transition('idle');
     cleanup();
-    ui.idle();
+    ui.idle("http://storage.googleapis.com/bmt-photobooth-staging/photobooth-20151017-021430-996.jpg");
     panel.on('activate', preview);
   }
 
