@@ -4,7 +4,8 @@
     <!-- TODO: Use a thumbnail here. -->
     <div class="col-xs-6 col-md-3 photo-thumb" ng-repeat="photo in photos">
       <a href="#!/photo/{{photo._id}}" class="thumbnail">
-        <img ng-src="http://storage.googleapis.com/{{photo.bucket}}/{{photo.name}}">
+        <img ng-if="photo.thumb" ng-src="http://storage.googleapis.com/{{photo.thumb.bucket}}/{{photo.thumb.name}}">
+        <img ng-if="!photo.thumb" ng-src="http://storage.googleapis.com/{{photo.bucket}}/{{photo.name}}">
       </a>
     </div>
   </div>
