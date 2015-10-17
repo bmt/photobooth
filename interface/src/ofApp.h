@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofURLFileLoader.h"
 #include "inputThread.h"
 #include "videoGrabber.h"
 #include "view.h"
@@ -15,6 +16,7 @@ public:
     void update();
     void draw();
 
+    void urlResponse(ofHttpResponse& response);
     void commandReceived(Command& cmd);
     void keyPressed(int key);
     void keyReleased(int key);
@@ -38,8 +40,13 @@ private:
     VideoGrabber previewVideo_;
     LoadingAnimation loadingAnimation_;
     Image finalImage_;
+    ofImage randomImage_;
     string shareUrl_;
     string processingMsg_;
+
+    // Filled in off thread.
+    bool randomImageReady_;
+    ofImage randomImageBack_;
 
     // View objects
     ofxTextBlock heading_;

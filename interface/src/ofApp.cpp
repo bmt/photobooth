@@ -4,6 +4,18 @@
 #include <vector>
 #include <algorithm>    // std::copy
 
+namespace {
+// TODO: Move to a utils package
+void drawBigImage(ofImage& image, float x, float y, float w, float h) {
+  ofImage left;
+  ofImage right;
+  left.cropFrom(image, 0, 0, w/2, h);
+  right.cropFrom(image, w/2, 0, w/2, h);
+  left.draw(x, y);
+  right.draw(x + w/2, y);
+}
+};
+
 ofApp::ofApp(const char* socket)
 : ofBaseApp(),
 socket_(socket),
@@ -44,6 +56,10 @@ void ofApp::setup(){
     previewVideo_.connect();
     previewVideo_.startThread();
     ofAddListener(inputThread_.onCommandReceived, this, &ofApp::commandReceived);
+
+    // Random image handler
+    randomImageReady_ = false;
+    ofRegisterURLNotification(this);
 }
 
 //--------------------------------------------------------------
@@ -52,6 +68,12 @@ void ofApp::update(){
     photoBar_.update(images_);
     loadingAnimation_.setVisible(false);
     loadingAnimation_.update();
+    if (randomImageReady_) {
+        swap(randomImage_, randomImageBack_);
+        randomImage_.setUseTexture(true);
+        randomImage_.update();
+        randomImageReady_ = false;
+    }
     switch (mode_) {
         case PREVIEW:
             previewVideo_.update();
@@ -119,6 +141,13 @@ void ofApp::draw(){
             pending_.draw();
             break;
         case IDLE:
+            if (randomImage_.isAllocated()) {
+                ofPushStyle();
+                ofSetColor(255);
+                drawBigImage(randomImage_, PREVIEW_X, PREVIEW_Y,
+                             PREVIEW_PHOTO_WIDTH, PREVIEW_PHOTO_HEIGHT);
+                ofPopStyle();
+            }
             idle_.draw();
             break;
         case PROCESSING:
@@ -213,6 +242,15 @@ void ofApp::commandReceived(Command& cmd) {
             }
             break;
         case IDLE:
+            if (cmd.args.size() > 0) {
+                cout << "Loading random image." << endl;
+                ofLoadURLAsync(cmd.args[0], "randomImage");
+            } else {
+                // Clear the image.
+                m_.lock();
+                randomImage_.clear();
+                m_.unlock();
+            }
         case PREVIEW:
         case ERROR:
         case UNKNOWN:
@@ -249,6 +287,21 @@ void ofApp::commandReceived(Command& cmd) {
     processingMsg_ = processingMsg;
     m_.unlock();
 }
+
+void ofApp::urlResponse(ofHttpResponse& response) {
+    if(response.status==200) {
+        cout << "Random image loaded.";
+        randomImageBack_.setUseTexture(false);
+        randomImageBack_.loadImage(response.data);
+        randomImageBack_.resize(PREVIEW_PHOTO_WIDTH, PREVIEW_PHOTO_HEIGHT);
+        m_.lock();
+        randomImageReady_ = true;
+        m_.unlock();
+    }else{
+        cout << response.status << " " << response.error << endl;
+    }
+}
+
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
