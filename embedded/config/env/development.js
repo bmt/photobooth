@@ -15,6 +15,6 @@ module.exports = {
   },
   interface: {
     path: interfacePaths[os.platform()],
-    maxRestarts: 5
+    maxRestarts: 50
   },
 };

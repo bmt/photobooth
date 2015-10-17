@@ -36,6 +36,12 @@ Interface.prototype.close = function() {
   }
 };
 
+Interface.prototype.sendLastCommand = function() {
+  if (this.lastCommand) {
+    this.sendCommand(this.lastCommand);
+  }
+};
+
 Interface.prototype.spawnInterfaceProcess = function() {
   // Start the process
   var p = spawn(config.interface.path, [this.socket]);
@@ -50,6 +56,10 @@ Interface.prototype.spawnInterfaceProcess = function() {
   p.stdout.pipe(process.stdout);
   p.stderr.pipe(process.stderr);
   this.process = p;
+  // This delay is necessary because the interface doesn't listen to stdin until
+  // after setting up everything else.  If I change that, I can remove this
+  // delay.
+  setTimeout(this.sendLastCommand.bind(this), 2000);
 };
 
 Interface.prototype.onError = function(err) {
@@ -82,6 +92,8 @@ Interface.prototype.sendCommand = function(mode, args) {
     cmd += '\t';
     cmd += args.join('\t');
   }
+  this.lastCommand = cmd;
+
   debug('Cmd: ' + cmd);
   if (this.process) {
     this.process.stdin.write(cmd + '\n');
