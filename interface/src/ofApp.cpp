@@ -12,8 +12,8 @@ previewVideo_(socket_),
 loadingAnimation_(LOADING_X, LOADING_Y),
 idle_(&text_),
 error_(&text_),
-preview_(&previewVideo_, &text_),
-pending_(&photoBar_, &previewVideo_, &loadingAnimation_, &text_),
+preview_(&text_),
+pending_(&photoBar_, &loadingAnimation_, &text_),
 finished_(&text_),
 processing_(&photoBar_, &loadingAnimation_, &text_) {};
 
@@ -53,24 +53,33 @@ void ofApp::update(){
     loadingAnimation_.setVisible(false);
     loadingAnimation_.update();
     switch (mode_) {
-        case PENDING:
-        case CAPTURE:
-            previewVideo_.update();
-            pending_.update(timeRemaining_, mode_ == CAPTURE);
-            break;
-        case FINISHED:
-            finished_.update(finalImage_, shareUrl_);
-            break;
         case PREVIEW:
             previewVideo_.update();
             break;
+        case PENDING:
+            previewVideo_.update();
+            pending_.update(timeRemaining_, mode_ == CAPTURE);
+            break;
+        case CAPTURE:
+            pending_.update(timeRemaining_, mode_ == CAPTURE);
+            break;
         case PROCESSING:
+            previewVideo_.clear();
             processing_.update(processingMsg_);
             break;
+        case FINISHED:
+            previewVideo_.clear();
+            finished_.update(finalImage_, shareUrl_);
+            break;
         case IDLE:
+            previewVideo_.clear();
+            idle_.update();
+            break;
         case ERROR:
         case UNKNOWN:
         default:
+            error_.update();
+            previewVideo_.clear();
             break;
     }
     m_.unlock();
@@ -98,15 +107,19 @@ void ofApp::draw(){
 
     // View-specific content
     switch (mode_) {
-        case IDLE:
-            idle_.draw();
-            break;
         case PREVIEW:
+            previewVideo_.draw(PREVIEW_X, PREVIEW_Y);
             preview_.draw();
             break;
         case PENDING:
+            previewVideo_.draw(PREVIEW_X, PREVIEW_Y);
+            pending_.draw();
+            break;
         case CAPTURE:
             pending_.draw();
+            break;
+        case IDLE:
+            idle_.draw();
             break;
         case PROCESSING:
             processing_.draw();
@@ -131,6 +144,10 @@ void ofApp::draw(){
     m_.unlock();
 }
 
+void printSize(float width, float height) {
+  cout << width << " X " << height;
+}
+
 void updateImageIfChanged(const string& newPath,
                           const Image& current,
                           int width,
@@ -140,14 +157,17 @@ void updateImageIfChanged(const string& newPath,
     if (newPath.size() && current.path != newPath) {
         newImg->preLoad(newPath);
         if (width > 0 && height > 0) {
+          //printSize(width, height);
           newImg->image->resize(width, height);
         } else if (width > 0) {
           float ratio = width / newImg->image->getWidth();
           float newHeight = ratio * newImg->image->getHeight();
+          //printSize(width, newHeight);
           newImg->image->resize(width, newHeight);
         } else if (height > 0) {
           float ratio = height / newImg->image->getHeight();
           float newWidth = ratio * newImg->image->getWidth();
+          //printSize(newWidth, height);
           newImg->image->resize(newWidth, height);
         }
     }
@@ -209,8 +229,7 @@ void ofApp::commandReceived(Command& cmd) {
     // Load any new images.
     for (int i = 0; i < 4; ++i) {
         updateImageIfChanged(imgPaths[i], images_[i],
-                             PHOTOBAR_PHOTO_WIDTH,
-                             PHOTOBAR_PHOTO_HEIGHT,
+                             PHOTOBAR_PHOTO_WIDTH, 0,
                              &(newImages[i]));
     }
     // TODO: This is slightly skewing the image.

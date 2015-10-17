@@ -20,16 +20,26 @@
 
 VideoGrabber::VideoGrabber(const string& addr)
 : ofThread(), addr_(addr) {
-    pixelsFront_.allocate(960, 640, 3);
-    pixelsBack_.allocate(960, 640, 3);
-    texture_.allocate(960,640,GL_RGB);
-
+    resetBuffers();
     initTime_ = 0;
     elapsedTime_ = 0;
     bytesReceived_ = 0;
     framesRendered_ = 0;
     currentBitRate_ = 0.0;
     currentFrameRate_ = 0.0;
+}
+
+// Assumes that you have already locked the mutex.
+void VideoGrabber::resetBuffers() {
+    pixelsFront_.clear();
+    pixelsFront_.allocate(960, 640, 3);
+
+    pixelsBack_.clear();
+    pixelsBack_.allocate(960, 640, 3);
+
+    texture_.clear();
+    texture_.allocate(960,640,GL_RGB);
+    clear_ = true;
 }
 
 int VideoGrabber::connect() {
@@ -52,6 +62,14 @@ int VideoGrabber::connect() {
         connected_ = true;
         cout << "Connected." << endl;
     }
+}
+
+void VideoGrabber::clear() {
+  mutex.lock();
+  if (!clear_) {
+    resetBuffers();
+  }
+  mutex.unlock();
 }
 
 void VideoGrabber::update() {
@@ -154,6 +172,7 @@ void VideoGrabber::threadedFunction() {
                                 //
                                 mutex.lock();
                                 backBufferReady_ = true;
+                                clear_ = false;
                                 mutex.unlock();
                                 //
                                 // END CRITICAL SECTION

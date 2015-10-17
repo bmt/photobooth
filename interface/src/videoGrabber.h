@@ -29,8 +29,10 @@ public:
     VideoGrabber(const string& addr);
     int connect();
     void update();
+    void clear();
     void draw(int x, int y);
 private:
+    void resetBuffers();
     void threadedFunction();
 
     // Stats
@@ -52,6 +54,9 @@ private:
     bool backBufferReady_;
     ofPixels pixelsFront_, pixelsBack_;
     ofTexture texture_;
+
+    // Buffers have been reset (and not yet written into).
+    bool clear_;
 };
 
 #endif /* videoGrabber_h */

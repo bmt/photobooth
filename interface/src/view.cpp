@@ -86,12 +86,7 @@ void PreviewView::update() {
     text_->setColor(0, 0, 0, 255);
 }
 
-void PreviewView::draw() {
-    ofPushStyle();
-    ofSetColor(0);
-    preview_->draw(PREVIEW_X, PREVIEW_Y);
-    ofPopStyle();
-}
+void PreviewView::draw() {}
 
 void PendingView::update(const string& timeRemaining, bool capturing) {
     timeRemaining_ = timeRemaining;
@@ -99,11 +94,8 @@ void PendingView::update(const string& timeRemaining, bool capturing) {
     if (capturing_) {
         load_->setVisible(true);
         text_->setText("Say Cheese!");
-    } else if (timeRemaining_ == "0") {
-        load_->setVisible(true);
-        text_->setText("Wait for the SECOND click.");
     } else {
-        text_->setText("");
+        text_->setText("Wait for the SECOND click!");
         countdown_.setText(timeRemaining_);
         countdown_.setColor(255, 255, 255, 150);
     }
@@ -114,7 +106,6 @@ void PendingView::draw() {
     ofPushStyle();
     ofSetColor(0);
     bar_->draw(PHOTOBAR_X, PHOTOBAR_Y);
-    preview_->draw(PREVIEW_X, PREVIEW_Y);
     string output;
     if (!capturing_ && timeRemaining_ != "0") {
         countdown_.drawCenter(COUNTDOWN_X, COUNTDOWN_Y);

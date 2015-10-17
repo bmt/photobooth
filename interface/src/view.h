@@ -10,7 +10,6 @@
 #define view_h
 
 #include "ofMain.h"
-#include "videoGrabber.h"
 #include "ofxTextSuite.h"
 #include "positions.h"
 #include <vector>
@@ -115,22 +114,17 @@ public:
 
 class PreviewView : public View {
 public:
-    PreviewView(VideoGrabber* preview, ofxTextBlock* text)
-      : View(text),
-        preview_(preview) {};
+    PreviewView(ofxTextBlock* text)
+      : View(text) {};
     virtual void draw();
     virtual void update();
-private:
-    VideoGrabber* preview_;
 };
 
 class PendingView : public View {
 public:
-    PendingView(PhotoBar* bar, VideoGrabber* preview,
-                LoadingAnimation* load, ofxTextBlock* text)
+    PendingView(PhotoBar* bar, LoadingAnimation* load, ofxTextBlock* text)
       : View(text),
         bar_(bar),
-        preview_(preview),
         load_(load),
         timeRemaining_("") {
             countdown_.init("verdana.ttf", COUNTDOWN_FONT_SIZE);
@@ -142,7 +136,6 @@ private:
     ofxTextBlock countdown_;
     string timeRemaining_;
     PhotoBar* bar_;
-    VideoGrabber* preview_;
     LoadingAnimation* load_;
 };
 
