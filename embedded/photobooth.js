@@ -164,7 +164,7 @@ var Photobooth = function(panel, camera, ui, server) {
       function tick() {
         --secondsRemaining;
         ui.pending(secondsRemaining, photos);
-        if (secondsRemaining) {
+        if (secondsRemaining > 1) {
           pendingTimeout = setTimeout(tick, 1000);
         } else {
           capture();
