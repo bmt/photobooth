@@ -90,8 +90,12 @@ Interface.prototype.sendCommand = function(mode, args) {
   }
 };
 
-Interface.prototype.idle = function() {
-  this.sendCommand(InterfaceMode.IDLE);
+Interface.prototype.idle = function(randomImage) {
+  var args = [];
+  if (randomImage) {
+    args.push(randomImage);
+  }
+  this.sendCommand(InterfaceMode.IDLE, args);
 };
 
 Interface.prototype.preview = function() {
