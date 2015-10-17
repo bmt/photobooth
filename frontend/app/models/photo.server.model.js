@@ -29,14 +29,6 @@ var PhotoSchema = new Schema({
     type: Schema.ObjectId,
     ref: 'Event',
   },
-  thumb: new Schema({
-    bucket: {
-      type: String,
-    },
-    name: {
-      type: String,
-    }
-  }),
 });
 
 mongoose.model('Photo', PhotoSchema);
