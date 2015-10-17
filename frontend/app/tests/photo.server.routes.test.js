@@ -4,6 +4,7 @@ var should = require('should'),
 	request = require('supertest'),
 	app = require('../../server'),
 	mongoose = require('mongoose'),
+  moment = require('moment'),
 	User = mongoose.model('User'),
 	Photo = mongoose.model('Photo'),
 	Event = mongoose.model('Event'),
@@ -127,16 +128,26 @@ describe('Photo CRUD tests', function() {
       event.save(function() {
         // Upload a photo in event.
         photo.event = event;
+        photo.name = 'one';
+        photo.created = moment().subtract(1, 'days');
         var eventPhoto = new Photo(photo);
+        photo.name = 'two';
+        photo.created = moment();
+        var eventPhoto2 = new Photo(photo);
         eventPhoto.save(function() {
-          // Request photos for event.
-          request(app).get('/photos?eventId=' + event.id)
-            .expect(200)
-            .end(function(req, res) {
-              res.body.should.be.an.Array.with.lengthOf(1);
-              res.body[0].event.should.equal(event.id);
-              done();
-            });
+          eventPhoto2.save(function() {
+            // Request photos for event.
+            request(app).get('/photos?eventId=' + event.id)
+              .expect(200)
+              .end(function(req, res) {
+                res.body.should.be.an.Array.with.lengthOf(2);
+                res.body[0].event.should.equal(event.id);
+                res.body[0].name.should.equal('two');
+                res.body[1].event.should.equal(event.id);
+                res.body[1].name.should.equal('one');
+                done();
+              });
+          });
         });
       });
     });
